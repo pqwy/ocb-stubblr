@@ -1,0 +1,6 @@
+#require "ocamlbuild,bos.setup"
+#directory "_build/src"
+#load "ocb-stubblr.cma"
+
+(* open Bos_setup *)
+open Ocb_stubblr

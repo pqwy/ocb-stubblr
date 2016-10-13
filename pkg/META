@@ -1,0 +1,18 @@
+description = "OCamlbuild plugin for C stubs"
+version = "%%VERSION%%"
+requires = "bos.setup"
+archive(byte) = "ocb-stubblr.cma"
+archive(native) = "ocb-stubblr.cmxa"
+plugin(byte) = "ocb-stubblr.cma"
+plugin(native) = "ocb-stubblr.cmxs"
+
+package "topkg" (
+  description = "OCamlbuild plugin for C stubs"
+  version = "%%VERSION%%"
+  requires = "topkg"
+  archive(byte) = "ocb-stubblr-topkg.cma"
+  archive(native) = "ocb-stubblr-topkg.cmxa"
+  plugin(byte) = "ocb-stubblr-topkg.cma"
+  plugin(native) = "ocb-stubblr-topkg.cmxs"
+  exists_if = "ocb-stubblr-topkg.cma"
+)

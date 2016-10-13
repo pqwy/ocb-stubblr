@@ -1,0 +1,10 @@
+true: color(always)
+true: bin_annot, safe_string
+true: warn(A-4-29-33-40-41-42-43-34-44-48)
+true: package(bytes)
+
+<src>: include
+<src/*.ml{,i}>: package(ocamlbuild), package(astring)
+
+<src-topkg>: include
+<src-topkg/*.ml{,i}>: package(topkg)
