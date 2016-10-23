@@ -1,0 +1,363 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="next" href="Ocb_stubblr_topkg.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Ocb_stubblr" rel="Chapter" href="Ocb_stubblr.html">
+<link title="Ocb_stubblr_topkg" rel="Chapter" href="Ocb_stubblr_topkg.html"><link title="Intro" rel="Section" href="#intro">
+<link title="Utilities" rel="Section" href="#utilities">
+<link title="Examples" rel="Section" href="#examples">
+<link title="Using .clib files" rel="Subsection" href="#2_Usingclibfiles">
+<link title="pkg-config" rel="Subsection" href="#2_pkgconfig">
+<link title="Multi-lib" rel="Subsection" href="#multilib">
+<link title="OS and machine detection" rel="Subsection" href="#2_OSandmachinedetection">
+<link title="Basic integration" rel="Subsection" href="#2_Basicintegration">
+<link title="pkg-config" rel="Subsection" href="#2_pkgconfig">
+<link title="In-tree executables" rel="Subsection" href="#2_Intreeexecutables">
+<link title="Multi-lib" rel="Subsection" href="#2_Multilib">
+<link title="Mirage" rel="Subsection" href="#2_Mirage">
+<link title="Composition" rel="Subsection" href="#2_Composition">
+<title>Ocb_stubblr</title>
+</head>
+<body>
+<div class="navbar">&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="Ocb_stubblr_topkg.html" title="Ocb_stubblr_topkg">Next</a>
+</div>
+<h1>Module <a href="type_Ocb_stubblr.html">Ocb_stubblr</a></h1>
+
+<pre><span class="keyword">module</span> Ocb_stubblr: <code class="code"><span class="keyword">sig</span></code> <a href="Ocb_stubblr.html">..</a> <code class="code"><span class="keyword">end</span></code></pre><div class="info module top">
+OCamlbuild plugin for C stubs
+<p>
+
+    OCamlbuild plugin for building C stubs. See the <a href="Ocb_stubblr.html#intro">Intro</a>,
+    <a href="Ocb_stubblr.html#utilities">Utilities</a> and <a href="Ocb_stubblr.html#examples">Examples</a>.<br>
+</div>
+<hr width="100%">
+<br>
+<h1 id="intro">Intro</h1>
+<p>
+
+    <code class="code">ocb-stubblr</code> helps dealing with C libraries, especially ones that provide
+    new primitives to OCaml programs (stubs).
+<p>
+
+    Most of the plugin consists of new tags and rules. In order to activate
+    them, <a href="Ocb_stubblr.html#VALinit"><code class="code"><span class="constructor">Ocb_stubblr</span>.init</code></a> needs to be called from <code class="code"><span class="constructor">Ocamlbuild_plugin</span>.dispatch</code>:
+<p>
+
+<pre class="codepre"><code class="code"><span class="keyword">let</span>&nbsp;()&nbsp;=&nbsp;<span class="constructor">Ocamlbuild_plugin</span>.dispatch&nbsp;<span class="constructor">Ocb_stubblr</span>.init</code></pre>
+<p>
+
+    The plugin helps with three aspects of building C stubs:
+<p>
+
+    <h2 id="2_Usingclibfiles">Using <code class="code">.clib</code> files</h2>
+<p>
+
+    The plugin adds header detection to <code class="code">.clib</code> targets, so that the <code class="code">.c</code> files
+    referenced by a <code class="code">.clib</code> are made to depend on any project-local files they
+    <code class="code"><span class="keywordsign">#</span><span class="keyword">include</span></code>.
+<p>
+
+    It also adds the parameterized tag <code class="code">link_stubs</code>. Tagging ocaml archives
+    (<code class="code">&lt;foo.cm{,x}a&gt;: link_stubs(path/libbar)</code>) makes them depend on the C
+    libraries produced by the file <code class="code">path/libbar.clib</code>. It also adds the
+    appropriate <code class="code">-cclib</code>/<code class="code">-dllib</code> flags when linking the native/bytecode
+    archives. This will record the linker flag <code class="code">-lbar.a</code> in the produced
+    archive, causing the final executables that use it, to also link with the
+    stub library.
+<p>
+
+    <h2 id="2_pkgconfig"><code class="code">pkg-config</code></h2>
+<p>
+
+    The plugin adds the parameterized tag <code class="code">pkg-config</code>.
+<p>
+
+    Tagging objects with <code class="code">pkg-config(package)</code> will query <code class="code">pkg-config</code> for the
+    <code class="code">package</code>, add its <code class="code">--cflags</code> to the compilation of tagged C files, and add
+    its <code class="code">--libs</code> to the linkage of tagged C and OCaml files.
+<p>
+
+    For example
+<pre class="codepre"><code class="code">&lt;src/*.{c,cma,cmxa}&gt;:&nbsp;pkg-config(sdl2)</code></pre>
+    will add the appropriate flags to compile the C sources with SDL2 includes,
+    link them with <code class="code">libSDL2</code>, and record the flags needed to link with SDL in
+    the OCaml archives.
+<p>
+
+    The full syntax of the tag is <code class="code">pkg-config(package[,relax][,static])</code>.
+<p>
+
+    <code class="code">relax</code> will ignore the package if it's not found. Without it, the
+    compilation will abort.
+    <code class="code">static</code> will use <code class="code">--static</code> instead of <code class="code">--libs</code> for the link tags.
+<p>
+
+    <b>Note</b> <code class="code">pc</code> files in the current Opam switch take precedence; see
+    <a href="Ocb_stubblr.Pkg_config.html"><code class="code"><span class="constructor">Pkg_config</span></code></a>.
+<p>
+
+    <h2 id="multilib">Multi-lib</h2>
+<p>
+
+    Sometimes it can be desirable to compile a C library in several ways, e.g.
+    with different compiler options, and install all of the versions.
+<p>
+
+    The plugin allows compiling every <code class="code">.clib</code> file <code class="code">path/libstub.clib</code> as if
+    the file <code class="code"><span class="constructor">X</span>/&lt;target&gt;/path/libstub+&lt;target&gt;.clib</code> was also present. It
+    will replicate the needed <code class="code">.c</code> and <code class="code">.h</code> files in the same directory.
+    For example, a valid new target is <code class="code"><span class="constructor">X</span>/foobar/path/libstub+foobar.a</code>. This
+    new archive is built from the same files as the original one, but it doesn't
+    inherit any of its directly applied tags. Instead, the files
+    <code class="code">&lt;<span class="constructor">X</span>/foobar/**/*&gt;</code> can be marked with a separate set of tags, in order to
+    build and link this archive with different options.
+<p>
+
+    As a special case, there are two pre-defined targets: <code class="code">mirage-xen</code> and
+    <code class="code">mirage-freestanding</code>. These are already marked with the compilation options
+    needed to produce C stubs that work with these two MirageOS backends.
+<p>
+
+    <b>Note</b> If your paths already contain <code class="code">+</code>, <code class="code"><span class="constructor">OCamlbuild</span></code> solver is likely to
+    get confused. Assume that the meaning of <code class="code">+</code> in paths has been hijacked by
+    <code class="code">ocb-stubblr</code>. The new semantics of <code class="code">+</code> is accessible only through
+    transcendental hermenautics.<br>
+<br>
+<h1 id="utilities">Utilities</h1><br>
+
+<pre><span id="TYPEocb_hook"><span class="keyword">type</span> <code class="type"></code>ocb_hook</span> = <code class="type">Ocamlbuild_plugin.hook -> unit</code> </pre>
+
+
+<pre><span id="TYPEpath"><span class="keyword">type</span> <code class="type"></code>path</span> = <code class="type">Ocamlbuild_plugin.Pathname.t</code> </pre>
+
+
+<pre><span id="VALinit"><span class="keyword">val</span> init</span> : <code class="type">?incdirs:bool -> ?mllibs:<a href="Ocb_stubblr.html#TYPEpath">path</a> list -> <a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a></code></pre><div class="info ">
+<code class="code">init ?incdirs ?paths</code> initializes the plugin.
+<p>
+
+    <code class="code">incdirs</code> controls wheter <a href="Ocb_stubblr.html#VALinclude_include_dirs"><code class="code">include_include_dirs</code></a> is
+    called. Defaults to <code class="code"><span class="keyword">true</span></code>. Use <code class="code"><span class="keyword">false</span></code> to disable.
+<p>
+
+    <code class="code">mllibs</code> passed to <a href="Ocb_stubblr.html#VALocaml_libs"><code class="code">ocaml_libs</code></a> to detect <code class="code">.mllib</code> files.
+    Defaults to <code class="code">[<span class="string">"."</span>]</code>. Use <code class="code">[]</code> to disable.<br>
+</div>
+
+<pre><span id="VALocaml_libs"><span class="keyword">val</span> ocaml_libs</span> : <code class="type">?mllibs:<a href="Ocb_stubblr.html#TYPEpath">path</a> list -> <a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a></code></pre><div class="info ">
+<code class="code">ocaml_libs ~mllibs</code> calls <code class="code"><span class="constructor">Ocamlbuild_plugin</span>.ocaml_lib</code> on every <code class="code">.mllib</code>
+    found in <code class="code">mllibs</code>.
+<p>
+
+    <code class="code">mllibs</code> is a list of either files or directories. Directories in the list
+    are searched recursively. <code class="code">mllibs</code> defaults to <code class="code">[<span class="string">"."</span>]</code>.
+<p>
+
+    It's a shortcut to enable <code class="code">use_LIB</code> tag for every <code class="code"><span class="constructor">LIB</span>.mllib</code>.<br>
+</div>
+
+<pre><span id="VALinclude_include_dirs"><span class="keyword">val</span> include_include_dirs</span> : <code class="type"><a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a></code></pre><div class="info ">
+<code class="code">include_include_dirs</code> will add <code class="code">-<span class="constructor">I</span> dir</code> when linking OCaml programs for
+    every <code class="code">dir</code> marked as <code class="code"><span class="keyword">include</span></code>. Hence, if the program is compiled against a
+    locally-built library that has extra <code class="code">-dllib</code> flags, the mentioned stubs
+    archives will be correctly resolved.<br>
+</div>
+
+<pre><span id="VALccopt_flags"><span class="keyword">val</span> ccopt_flags</span> : <code class="type">?tags:string list -> string -> <a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a></code></pre><div class="info ">
+<code class="code">ccopt_flags tags options</code> is an <a href="Ocb_stubblr.html#TYPEocb_hook"><code class="code">ocb_hook</code></a> adding
+    <code class="code">-ccopt options</code> when compiling C sources tagged with <code class="code">~tags</code>.
+<p>
+
+    <code class="code">tags</code> defaults to <code class="code">[]</code>.<br>
+</div>
+
+<pre><span id="VALcclib_flags"><span class="keyword">val</span> cclib_flags</span> : <code class="type">?tags:string list -> string -> <a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a></code></pre><div class="info ">
+<code class="code">cclib_flags tags options</code> is an <a href="Ocb_stubblr.html#TYPEocb_hook"><code class="code">ocb_hook</code></a> adding
+    <code class="code">-cclib options</code> when linking C objects tagged with <code class="code">~tags</code>.
+<p>
+
+    <code class="code">tags</code> defaults to <code class="code">[]</code>.<br>
+</div>
+
+<pre><span id="VALafter_rules"><span class="keyword">val</span> after_rules</span> : <code class="type">(unit -> unit) -> <a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a></code></pre><div class="info ">
+<code class="code">after_rules f</code> is <code class="code"><span class="keyword">function</span> <span class="constructor">After_rules</span> <span class="keywordsign">-&gt;</span> f () <span class="keywordsign">|</span> _ <span class="keywordsign">-&gt;</span> ()</code>.<br>
+</div>
+
+<pre><span id="VALdispatchv"><span class="keyword">val</span> dispatchv</span> : <code class="type"><a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a> list -> unit</code></pre><div class="info ">
+<code class="code">dispatchv hooks</code> is a shortcut for registering several
+    <a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hooks</a>.
+<p>
+
+    It is equivalent to <code class="code"><span class="constructor">Ocamlbuild_plugin</span>.dispatch hookf</code> where <code class="code">hookf</code> is a
+    function that applies each hook from <code class="code">hooks</code> in order.<br>
+</div>
+
+<pre><span id="VAL(&)"><span class="keyword">val</span> (&amp;)</span> : <code class="type"><a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a> -> <a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a> -> <a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a></code></pre><div class="info ">
+<code class="code">h1 <span class="keywordsign">&amp;</span> h2</code> is a hook combining <code class="code">h1</code> and <code class="code">h2</code>.<br>
+</div>
+
+<pre><span class="keyword">module</span> <a href="Ocb_stubblr.Pkg_config.html">Pkg_config</a>: <code class="code"><span class="keyword">sig</span></code> <a href="Ocb_stubblr.Pkg_config.html">..</a> <code class="code"><span class="keyword">end</span></code></pre><div class="info">
+Query <code class="code">pkg-config</code>.
+</div>
+<br>
+<h2 id="2_OSandmachinedetection">OS and machine detection</h2>
+<p>
+
+    These utilities are included because the host OS and architecture are
+    sometimes important when building C stubs.<br>
+
+<pre><span id="TYPEos"><span class="keyword">type</span> <code class="type"></code>os</span> = <code class="type">[ `AIX<br>       | `Cygwin of string<br>       | `Darwin<br>       | `DragonFly<br>       | `FreeBSD<br>       | `HP_UX<br>       | `Haiku<br>       | `Hurd<br>       | `Interix<br>       | `KFreeBSD<br>       | `Linux<br>       | `Mingw of string<br>       | `Minix<br>       | `NetBSD<br>       | `OpenBSD<br>       | `QNX<br>       | `SunOS<br>       | `UNKNOWN of string<br>       | `Uwin of string ]</code> </pre>
+<div class="info ">
+A selection of favourite operating systems.<br>
+</div>
+
+
+<pre><span id="TYPEmachine"><span class="keyword">type</span> <code class="type"></code>machine</span> = <code class="type">[ `ARMv6 | `ARMv7 | `UNKNOWN of string | `x86 | `x86_64 ]</code> </pre>
+<div class="info ">
+A selection of machine architectures.<br>
+</div>
+
+
+<pre><span id="VALos"><span class="keyword">val</span> os</span> : <code class="type">unit -> <a href="Ocb_stubblr.html#TYPEos">os</a></code></pre><div class="info ">
+<code class="code">os ()</code> is the normalized result of <code class="code">uname -s</code>.<br>
+</div>
+
+<pre><span id="VALmachine"><span class="keyword">val</span> machine</span> : <code class="type">unit -> <a href="Ocb_stubblr.html#TYPEmachine">machine</a></code></pre><div class="info ">
+<code class="code">machine ()</code> is the normalized result of <code class="code">uname -m</code>.<br>
+</div>
+<br>
+<h1 id="examples">Examples</h1>
+<p>
+
+    Assume a project laid out like the following:
+<p>
+
+    Project dir:
+<pre class="codepre"><code class="code">./myocamlbuild.ml
+./_tags
+./src/foo.ml
+./src/stubs.c
+./src/extra/defs.h
+./src/libstubs.clib
+./src/foo.mllib
+./exe/demo.ml</code></pre>
+<p>
+
+    The content of <code class="code">src/foo.mllib</code>:
+<pre class="codepre"><code class="code"><span class="constructor">Foo</span></code></pre>
+<p>
+
+    The content of <code class="code">src/libstubs.clib</code>:
+<pre class="codepre"><code class="code">stubs.o</code></pre>
+<p>
+
+    The content of <code class="code">_tags</code>:
+<pre class="codepre"><code class="code">&lt;src&gt;:&nbsp;<span class="keyword">include</span></code></pre>
+<p>
+
+    <h2 id="2_Basicintegration">Basic integration</h2>
+<p>
+
+    Initialize from <code class="code">myocamlbuild.ml</code>:
+<pre class="codepre"><code class="code"><span class="keyword">let</span>&nbsp;()&nbsp;=&nbsp;<span class="constructor">Ocamlbuild_plugin</span>.dispatch&nbsp;<span class="constructor">Ocb_stubblr</span>.init</code></pre>
+<p>
+
+    The file <code class="code">src/extra/defs.h</code> will be automatically used when compiling
+    <code class="code">src/stubs.c</code>, if the latter <code class="code"><span class="keywordsign">#</span><span class="keyword">include</span></code>s it.
+<p>
+
+    Adding the tag
+<pre class="codepre"><code class="code">&lt;src/*.cm{,x}a&gt;:&nbsp;link_stubs(src/libstubs)</code></pre>
+    will make <code class="code">foo.cmxa</code>/<code class="code">foo.cma</code> link against <code class="code">libstubs.a</code>/<code class="code">dllstubs.so</code>.
+<p>
+
+    <h2 id="2_pkgconfig"><code class="code">pkg-config</code></h2>
+<p>
+
+    Adding the tag
+<pre class="codepre"><code class="code">&lt;src/*.{c,cma,cmxa}&gt;:&nbsp;pkg-config(sdl2,&nbsp;relax)</code></pre>
+    will add the appropriate compilation and linkage flags to the C sources and
+    archives, and the OCaml archives. If <code class="code">sdl2</code> is not installed, it will be
+    ignored.
+<p>
+
+    <h2 id="2_Intreeexecutables">In-tree executables</h2>
+<p>
+
+    To build <code class="code">demo.native</code> and/or <code class="code">demo.byte</code>, <code class="code">_tags</code> needs to contain
+<p>
+
+<pre class="codepre"><code class="code">&lt;exe/*&gt;:&nbsp;use_foo</code></pre>
+<p>
+
+    This will create the tag <code class="code">use_foo</code> (see <a href="Ocb_stubblr.html#VALocaml_libs"><code class="code">ocaml_libs</code></a>), causing
+    <code class="code">demo</code> to link with the <code class="code">cm{,x}a</code> archive. The archive in turn contains the
+    link flags for the stubs library (<code class="code">link_stubs</code>), and <code class="code">sdl2</code> (<code class="code">pkg-config</code>).
+    It will also add <code class="code">src</code> to the include path when linking OCaml executables
+    (see <a href="Ocb_stubblr.html#VALinclude_include_dirs"><code class="code">include_include_dirs</code></a>).
+<p>
+
+    <h2 id="2_Multilib">Multi-lib</h2>
+<p>
+
+    Invoking <code class="code">ocamlbuild <span class="constructor">X</span>/t/src/libstubs+t.a</code> will build <code class="code">libstubs+t.a</code>.
+<p>
+
+    If <code class="code">_tags</code> contained
+<pre class="codepre"><code class="code">&lt;src/*.c&gt;:&nbsp;ccopt(-flub)
+&lt;<span class="constructor">X</span>/t/**/*.c&gt;:&nbsp;ccopt(-<span class="constructor">DT</span>)</code></pre>
+<p>
+
+    then <code class="code">libstubs+t.a</code> would <em>not</em> be compiled with <code class="code">-flub</code>. Instead, the
+    pre-processor symbol <code class="code"><span class="constructor">T</span></code> would be defined during compilation.
+<p>
+
+    <h2 id="2_Mirage">Mirage</h2>
+<p>
+
+    If using <code class="code"><span class="constructor">Topkg</span></code>, register the <code class="code">.clib</code> file using
+    <a href="Ocb_stubblr_topkg.html#VALmirage"><code class="code"><span class="constructor">Ocb_stubblr_topkg</span>.mirage</code></a>.
+<p>
+
+<pre class="codepre"><code class="code"><span class="constructor">Pkg</span>.describe&nbsp;...&nbsp;@&nbsp;<span class="keyword">fun</span>&nbsp;c&nbsp;<span class="keywordsign">-&gt;</span>
+&nbsp;&nbsp;...
+&nbsp;&nbsp;<span class="constructor">Ok</span>&nbsp;([&nbsp;<span class="constructor">Pkg</span>.clib&nbsp;<span class="string">"path/to/libstubs.clib"</span>&nbsp;]&nbsp;@
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Ocb_stubblr_topkg</span>.mirage&nbsp;<span class="string">"path/to/libstubs.clib"</span>)</code></pre>
+<p>
+
+    or directly require individual targets:
+<p>
+
+<pre class="codepre"><code class="code"><span class="constructor">Pkg</span>.[clib&nbsp;<span class="string">"src/libstubs.clib"</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;clib&nbsp;<span class="string">"X/mirage-xen/src/libstubs+mirage-xen.clib"</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;clib&nbsp;<span class="string">"X/mirage-freestanding/libstubs+mirage-freestanding.clib"</span>]</code></pre>
+<p>
+
+    Otherwise, arrange for these libraries to be installed.
+<p>
+
+    When using Mirage, the <code class="code"><span class="constructor">META</span></code> file still needs to be extended with the
+    appropriate link flags, to signal the <code class="code">mirage</code> tool to redirect linkage for
+    various targets.
+<p>
+
+    <h2 id="2_Composition">Composition</h2>
+<p>
+
+<pre class="codepre"><code class="code"><span class="keyword">let</span>&nbsp;myhook&nbsp;=&nbsp;<span class="keyword">function</span>
+&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">After_rules</span>&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;...
+&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;...</code></pre>
+<p>
+
+<pre class="codepre"><code class="code"><span class="keyword">let</span>&nbsp;()&nbsp;=&nbsp;<span class="constructor">Ocb_stubblr</span>.(dispatchv&nbsp;[&nbsp;init;&nbsp;myhook;&nbsp;])</code></pre>
+<p>
+
+<pre class="codepre"><code class="code"><span class="keyword">let</span>&nbsp;()&nbsp;=&nbsp;dispatch&nbsp;<span class="constructor">Ocb_stubblr</span>.(init&nbsp;<span class="keywordsign">&amp;</span>&nbsp;myhook)</code></pre><br>
+</body></html>

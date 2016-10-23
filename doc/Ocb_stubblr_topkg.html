@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Ocb_stubblr.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Ocb_stubblr" rel="Chapter" href="Ocb_stubblr.html">
+<link title="Ocb_stubblr_topkg" rel="Chapter" href="Ocb_stubblr_topkg.html"><link title="Activating ocb-stubblr" rel="Section" href="#1_Activatingocbstubblr">
+<link title="Install helpers" rel="Section" href="#1_Installhelpers">
+<link title="Usage" rel="Section" href="#1_Usage">
+<link title="Hooking up ocb-stubblr" rel="Subsection" href="#2_Hookingupocbstubblr">
+<link title="Mirage" rel="Subsection" href="#2_Mirage">
+<title>Ocb_stubblr_topkg</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Ocb_stubblr.html" title="Ocb_stubblr">Previous</a>
+&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;</div>
+<h1>Module <a href="type_Ocb_stubblr_topkg.html">Ocb_stubblr_topkg</a></h1>
+
+<pre><span class="keyword">module</span> Ocb_stubblr_topkg: <code class="code"><span class="keyword">sig</span></code> <a href="Ocb_stubblr_topkg.html">..</a> <code class="code"><span class="keyword">end</span></code></pre><div class="info module top">
+Hook up <a href="Ocb_stubblr.html"><code class="code"><span class="constructor">Ocb_stubblr</span></code></a> with <code class="code">topkg</code>.<br>
+</div>
+<hr width="100%">
+<br>
+<h1 id="1_Activatingocbstubblr">Activating <code class="code">ocb-stubblr</code></h1><br>
+
+<pre><span id="VALbuild_arg"><span class="keyword">val</span> build_arg</span> : <code class="type">Topkg.Cmd.t</code></pre><div class="info ">
+<code class="code">build_arg</code> is the command-line parameter that needs to be passed to
+    <code class="code">ocamlbuild</code> in order to access <a href="Ocb_stubblr.html"><code class="code"><span class="constructor">Ocb_stubblr</span></code></a> inside <code class="code">myocamlbuild.ml</code>.<br>
+</div>
+
+<pre><span id="VALbuild_cmd"><span class="keyword">val</span> build_cmd</span> : <code class="type">Topkg.Conf.t -> Topkg.Conf.os -> Topkg.Cmd.t</code></pre><div class="info ">
+<code class="code">build_cmd c os</code> is the default <code class="code"><span class="constructor">Topkg</span>.build_cmd</code> extended with
+    <a href="Ocb_stubblr_topkg.html#VALbuild_arg"><code class="code">build_arg</code></a>.<br>
+</div>
+
+<pre><span id="VALcmd"><span class="keyword">val</span> cmd</span> : <code class="type">Topkg.Conf.t -> Topkg.Conf.os -> Topkg.fpath list -> unit Topkg.result</code></pre><div class="info ">
+<code class="code">cmd c os files</code> is a full invocation of <a href="Ocb_stubblr_topkg.html#VALbuild_cmd"><code class="code">build_cmd</code></a>.<br>
+</div>
+<br>
+<h1 id="1_Installhelpers">Install helpers</h1><br>
+
+<pre><span id="VALmirage"><span class="keyword">val</span> mirage</span> : <code class="type">?lib_dst_dir:Topkg.fpath -><br>       ?xen:bool -> ?fs:bool -> Topkg.fpath -> Topkg.Pkg.install list</code></pre><div class="info ">
+<code class="code">mirage ?lib_dst_dir ?cond ?xen ?fs clib</code> installs Mirage-specific 
+    <a href="Ocb_stubblr.html#multilib">multi-lib</a> variants of <code class="code">.clib</code>. It hands off to
+    <code class="code"><span class="constructor">Topkg</span>.<span class="constructor">Pkg</span>.clib</code>.
+<p>
+
+    <code class="code">lib_dst_dir</code> is passed to <code class="code">clib</code>.
+<p>
+
+    <code class="code">xen</code> controls <code class="code">mirage-xen</code> target. Defaults to <code class="code"><span class="keyword">false</span></code>.
+<p>
+
+    <code class="code">fs</code> controls <code class="code">mirage-freestanding</code> target. Defaults to <code class="code"><span class="keyword">false</span></code>.<br>
+</div>
+<br>
+<h1 id="1_Usage">Usage</h1>
+<p>
+
+    In <code class="code">pkg.ml</code>:
+<p>
+
+    <h2 id="2_Hookingupocbstubblr">Hooking up <code class="code">ocb-stubblr</code></h2>
+<p>
+
+<pre class="codepre"><code class="code"><span class="keyword">let</span>&nbsp;build&nbsp;=&nbsp;<span class="constructor">Pkg</span>.build&nbsp;~cmd:<span class="constructor">Ocb_stubblr_topkg</span>.cmd&nbsp;()
+
+<span class="keyword">let</span>&nbsp;()&nbsp;=&nbsp;<span class="constructor">Pkg</span>.describe&nbsp;~build&nbsp;...</code></pre>
+<p>
+
+    <h2 id="2_Mirage">Mirage</h2>
+<p>
+
+<pre class="codepre"><code class="code"><span class="constructor">Pkg</span>.describe&nbsp;...&nbsp;@@&nbsp;<span class="keyword">fun</span>&nbsp;c&nbsp;<span class="keywordsign">-&gt;</span>
+&nbsp;&nbsp;...
+&nbsp;&nbsp;<span class="constructor">Ok</span>&nbsp;([&nbsp;...&nbsp;]&nbsp;@
+&nbsp;&nbsp;<span class="constructor">Ocb_stubblr_topkg</span>.clib_mirage
+&nbsp;&nbsp;&nbsp;&nbsp;~cond&nbsp;~xen&nbsp;~fs&nbsp;<span class="string">"path/to/libstubs.clib"</span>)</code></pre><br>
+</body></html>

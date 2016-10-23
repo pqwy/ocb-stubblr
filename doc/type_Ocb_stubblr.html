@@ -1,0 +1,53 @@
+<html><head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Ocb_stubblr" rel="Chapter" href="Ocb_stubblr.html">
+<link title="Ocb_stubblr_topkg" rel="Chapter" href="Ocb_stubblr_topkg.html"><title>Ocb_stubblr</title>
+</head>
+<body>
+<code class="code"><span class="keyword">sig</span>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;ocb_hook&nbsp;=&nbsp;<span class="constructor">Ocamlbuild_plugin</span>.hook&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;path&nbsp;=&nbsp;<span class="constructor">Ocamlbuild_plugin</span>.<span class="constructor">Pathname</span>.t
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;init&nbsp;:
+&nbsp;&nbsp;&nbsp;&nbsp;?incdirs:bool&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?mllibs:<span class="constructor">Ocb_stubblr</span>.path&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Ocb_stubblr</span>.ocb_hook
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ocaml_libs&nbsp;:&nbsp;?mllibs:<span class="constructor">Ocb_stubblr</span>.path&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Ocb_stubblr</span>.ocb_hook
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;include_include_dirs&nbsp;:&nbsp;<span class="constructor">Ocb_stubblr</span>.ocb_hook
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ccopt_flags&nbsp;:&nbsp;?tags:string&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Ocb_stubblr</span>.ocb_hook
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;cclib_flags&nbsp;:&nbsp;?tags:string&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Ocb_stubblr</span>.ocb_hook
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;after_rules&nbsp;:&nbsp;(unit&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit)&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Ocb_stubblr</span>.ocb_hook
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;dispatchv&nbsp;:&nbsp;<span class="constructor">Ocb_stubblr</span>.ocb_hook&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;(&nbsp;<span class="keywordsign">&amp;</span>&nbsp;)&nbsp;:
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Ocb_stubblr</span>.ocb_hook&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Ocb_stubblr</span>.ocb_hook&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Ocb_stubblr</span>.ocb_hook
+&nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Pkg_config</span>&nbsp;:
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">sig</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;run&nbsp;:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;flags:string&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;[&nbsp;<span class="keywordsign">`</span><span class="constructor">Nonexistent</span>&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">Res</span>&nbsp;<span class="keyword">of</span>&nbsp;string&nbsp;]
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">end</span>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;os&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[&nbsp;<span class="keywordsign">`</span><span class="constructor">AIX</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">Cygwin</span>&nbsp;<span class="keyword">of</span>&nbsp;string
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">Darwin</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">DragonFly</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">FreeBSD</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">HP_UX</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">Haiku</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">Hurd</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">Interix</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">KFreeBSD</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">Linux</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">Mingw</span>&nbsp;<span class="keyword">of</span>&nbsp;string
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">Minix</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">NetBSD</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">OpenBSD</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">QNX</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">SunOS</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">UNKNOWN</span>&nbsp;<span class="keyword">of</span>&nbsp;string
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">Uwin</span>&nbsp;<span class="keyword">of</span>&nbsp;string&nbsp;]
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;machine&nbsp;=&nbsp;[&nbsp;<span class="keywordsign">`</span><span class="constructor">ARMv6</span>&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">ARMv7</span>&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">UNKNOWN</span>&nbsp;<span class="keyword">of</span>&nbsp;string&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span>x86&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span>x86_64&nbsp;]
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;os&nbsp;:&nbsp;unit&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Ocb_stubblr</span>.os
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;machine&nbsp;:&nbsp;unit&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Ocb_stubblr</span>.machine
+<span class="keyword">end</span></code></body></html>
