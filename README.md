@@ -30,6 +30,7 @@ ocb-stubblr is distributed under the ISC license.
       Pkg.describe ~build:(Pkg.build ~cmd ()) ...
 
 `myocamlbuild.ml`:
+
     open Ocamlbuild_plugin
 
     let () = dispatchv Ocb_stubblr.init
