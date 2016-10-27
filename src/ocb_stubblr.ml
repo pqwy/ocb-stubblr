@@ -12,11 +12,11 @@ let (>>=) a b = match a with Some x -> b x | _ -> None
 let strf = Format.asprintf
 
 let error_msgf fmt =
-  Format.kasprintf (fun str -> raise (Failure str)) ("Ocb_stubblr: " ^^ fmt)
+  Format.ksprintf (fun str -> raise (Failure str)) ("Ocb_stubblr: " ^^ fmt)
 
 let error_exit_msgf fmt =
   let k str = Format.printf "%s\n%!" str; exit 1 in
-  Format.kasprintf k ("Ocb_stubblr: " ^^ fmt)
+  Format.ksprintf k ("Ocb_stubblr: " ^^ fmt)
 
 let chomp s =
   let drop ~rev s = String.drop ~rev ~sat:Char.Ascii.is_white s in
@@ -154,7 +154,7 @@ let link_rules () =
     let name = Pathname.(remove_extension clib |> basename) in
     let name = String.(if is_prefix ~affix:"lib" name then drop ~max:3 name else name) in
     S [A switch; A ("-l"^name)]
-  and dep flag = Pathname.[remove_extension flag -.- "a"] in
+  and dep flag = Pathname.([remove_extension flag -.- "a"]) in
   pflag ["link"; "ocaml"; "library"; "byte"] tag (libarg "-dllib");
   pflag ["link"; "ocaml"; "library"; "native"] tag  (libarg "-cclib");
   pdep ["link"; "ocaml"] tag dep;

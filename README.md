@@ -55,3 +55,5 @@ Interfaces are documented. [Online][doc] too.
 
 Feel free to pitch in with ideas, especially if you have work-flows that are
 not, but could *almost* be supported.
+
+[![Build Status](https://travis-ci.org/pqwy/ocb-stubblr.svg?branch=master)](https://travis-ci.org/pqwy/ocb-stubblr)
