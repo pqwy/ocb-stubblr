@@ -1,6 +1,6 @@
 description = "OCamlbuild plugin for C stubs"
 version = "%%VERSION%%"
-requires = "bos.setup"
+requires = "astring ocamlbuild"
 archive(byte) = "ocb-stubblr.cma"
 archive(native) = "ocb-stubblr.cmxa"
 plugin(byte) = "ocb-stubblr.cma"
