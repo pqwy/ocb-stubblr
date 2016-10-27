@@ -1,5 +1,5 @@
 description = "OCamlbuild plugin for C stubs"
-version = "%%VERSION%%"
+version = "%%VERSION_NUM%%"
 requires = "astring ocamlbuild"
 archive(byte) = "ocb-stubblr.cma"
 archive(native) = "ocb-stubblr.cmxa"
@@ -8,7 +8,7 @@ plugin(native) = "ocb-stubblr.cmxs"
 
 package "topkg" (
   description = "OCamlbuild plugin for C stubs"
-  version = "%%VERSION%%"
+  version = "%%VERSION_NUM%%"
   requires = "topkg"
   archive(byte) = "ocb-stubblr-topkg.cma"
   archive(native) = "ocb-stubblr-topkg.cmxa"
