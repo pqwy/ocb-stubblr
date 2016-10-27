@@ -10,7 +10,7 @@ tags: []
 available: [ ocaml-version >= "4.02.0"]
 depends: [
   "ocamlfind" {build}
-  "ocamlbuild" {>="0.9.3"}
+  "ocamlbuild"
   "topkg"
   "astring" ]
 depopts: []
