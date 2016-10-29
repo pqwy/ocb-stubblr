@@ -165,14 +165,21 @@ let link_flag () =
 
 let cdeps c deps env _ =
   let c = env c and deps = env deps in
-  Cmd (S [A "cc"; T (tags_of_pathname c); A "-MM"; A "-MG"; A "-MF"; Px deps; P c])
+  (* XXX FIXME FRAGILE: figure out the actual source dir. *)
+  let root = ".." in
+  let cmd = Cmd (S [A "cd"; P root; Sh "&&"; A "cc"; A "-MM"; A "-MG"; P c]) in
+  let to_list str =
+    String.fields ~empty:false ~is_sep:Char.Ascii.is_white str
+      |> List.filter ((<>) "\\") in
+  let lines = match Command.to_string cmd |> run_and_read |> to_list with
+    | _::_::xs -> List.map (fun p -> Pathname.normalize p ^ "\n") xs
+    | _ -> error_exit_msgf "%s: depends: unrecognized format" c in
+  Echo (lines, deps)
 
 let cc_rules () =
 
   rule "ocaml C stubs: c -> c.depends"
     ~dep:"%.c" ~prod:"%.c.depends" (cdeps "%.c" "%.c.depends");
-  (* rule "ocaml C stubs: h -> h.depends" *)
-  (*   ~dep:"%.h" ~prod:"%.h.depends" (cdeps "%.h" "%.h.depends") *)
 
   let x_o = "%"-.-(!Options.ext_obj) in
   (* XXX
@@ -188,19 +195,14 @@ let cc_rules () =
     else Seq[cc; mv (Pathname.basename o) o]
   in
   let action env build =
-    let c = env "%.c"
-    and depends = env "%.c.depends" in
-    let dir = Pathname.dirname c in
-    let deps = match string_list_of_file depends with
-      | _::_::xs -> xs
-      | _        -> error_exit_msgf "%s: unrecognized format" depends
+    let deps = string_list_of_file (env "%.c.depends")
     and check_outcome = function
       | Good _ -> ()
       | Bad _  -> () in
       (* XXX We ignore errors here because we can't tell the difference
        * between external and internal includes. *)
-        (* error_msgf "building %s: %s" c (Printexc.to_string exn) *)
-    build (List.map (fun d -> [dir/d]) deps) |> List.iter check_outcome;
+      (* | Bad exn  -> error_msgf "building %s: %s" c (Printexc.to_string exn) in *)
+    build (List.map (fun p -> [p]) deps) |> List.iter check_outcome;
     default_action env build in
   rule "ocaml C stubs: c & c.depends -> o"
     ~prod:x_o
@@ -258,10 +260,17 @@ let pkg_conf_flag () =
 
 (* multi-lib *)
 
+let x_cdeps src dst target env _ =
+  let target = env target
+  and paths = string_list_of_file (env src) in
+  Echo (List.map (fun p -> "X"/target/p^"\n") paths, env dst)
+
 let x_rules () =
+  rule "multi-lib: .deps"
+    ~dep:"%(path).c.depends" ~prod:"X/%(target)/%(path).c.depends"
+    (x_cdeps "%(path).c.depends" "X/%(target)/%(path).c.depends" "%(target)");
   copy_rule "multi-lib: .c" "%(path).c" "X/%(target)/%(path).c";
   copy_rule "multi-lib: .h" "%(path).h" "X/%(target)/%(path).h";
-  copy_rule "multi-lib: .deps" "%(path).c.depends" "X/%(target)/%(path).c.depends";
   copy_rule "multi-lib: .clib" "%(path).clib" "X/%(target)/%(path)+%(target).clib";
   Configuration.parse_string
     "<X/mirage-xen/**>: pkg-config(mirage-xen, relax, static)";
