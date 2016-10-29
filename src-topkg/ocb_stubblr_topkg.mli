@@ -47,7 +47,6 @@ let () = Pkg.describe ~build ...]}
 {[Pkg.describe ... @@ fun c ->
   ...
   Ok ([ ... ] @
-  Ocb_stubblr_topkg.clib_mirage
-    ~cond ~xen ~fs "path/to/libstubs.clib")]}
+    mirage ~xen ~fs "path/to/libstubs.clib")]}
 
 *)

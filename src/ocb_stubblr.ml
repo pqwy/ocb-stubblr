@@ -148,7 +148,7 @@ let machine () =
 
 (* link_stubs(path/to/clib) *)
 
-let link_rules () =
+let link_flag () =
   let tag = "link_stubs" in
   let libarg switch clib =
     let name = Pathname.(remove_extension clib |> basename) in
@@ -168,6 +168,7 @@ let cdeps c deps env _ =
   Cmd (S [A "cc"; T (tags_of_pathname c); A "-MM"; A "-MG"; A "-MF"; Px deps; P c])
 
 let cc_rules () =
+
   rule "ocaml C stubs: c -> c.depends"
     ~dep:"%.c" ~prod:"%.c.depends" (cdeps "%.c" "%.c.depends");
   (* rule "ocaml C stubs: h -> h.depends" *)
@@ -234,7 +235,7 @@ let get_pkgconf argstring =
   | Some (cf, _, st) when static -> Some (cf, st)
   | Some (cf, lb, _) -> Some (cf, lb)
 
-let pkg_conf_rules () =
+let pkg_conf_flag () =
   let tag = "pkg-config" in
   let pkgconf p f args =
     match get_pkgconf args with Some r when p r <> "" -> f (p r) | _ -> S [] in
@@ -260,6 +261,7 @@ let pkg_conf_rules () =
 let x_rules () =
   copy_rule "multi-lib: .c" "%(path).c" "X/%(target)/%(path).c";
   copy_rule "multi-lib: .h" "%(path).h" "X/%(target)/%(path).h";
+  copy_rule "multi-lib: .deps" "%(path).c.depends" "X/%(target)/%(path).c.depends";
   copy_rule "multi-lib: .clib" "%(path).clib" "X/%(target)/%(path)+%(target).clib";
   Configuration.parse_string
     "<X/mirage-xen/**>: pkg-config(mirage-xen, relax, static)";
@@ -270,10 +272,10 @@ let x_rules () =
 
 let rules = function
 | Before_rules ->
-    link_rules ();
+    link_flag ();
+    pkg_conf_flag ();
+    x_rules ();
     cc_rules ();
-    pkg_conf_rules ();
-    x_rules ()
 | _ -> ()
 
 let ignore _ = ()

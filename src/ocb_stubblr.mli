@@ -82,7 +82,7 @@
     *)
 
 
-(** {1:utilities Utilities} *)
+(** {1:interface Interface} *)
 
 open Ocamlbuild_plugin
 
@@ -98,6 +98,8 @@ val init : ?incdirs:bool -> ?mllibs:path list -> ocb_hook
 
     [mllibs] passed to {{!ocaml_libs}[ocaml_libs]} to detect [.mllib] files.
     Defaults to [["."]]. Use [[]] to disable. *)
+
+(** {2:utilities Utilities} *)
 
 val ocaml_libs : ?mllibs:path list -> ocb_hook
 (** [ocaml_libs ~mllibs] calls {!Ocamlbuild_plugin.ocaml_lib} on every [.mllib]

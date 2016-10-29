@@ -33,7 +33,7 @@ ocb-stubblr is distributed under the ISC license.
 
     open Ocamlbuild_plugin
 
-    let () = dispatchv Ocb_stubblr.init
+    let () = dispatch Ocb_stubblr.init
 
 `opam`:
 
