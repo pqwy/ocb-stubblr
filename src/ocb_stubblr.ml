@@ -282,12 +282,28 @@ let x_rules () =
   Configuration.parse_string
     "<X/mirage-freestanding/**>: pkg-config(ocaml-freestanding, relax, static)"
 
+(* back-ports of 0.9.3 flags *)
+
+let backported_c_flags () =
+  let vs = ["4.01"; "4.02"] in
+  if List.exists (fun affix -> String.is_prefix ~affix Sys.ocaml_version) vs
+  (* Inject flags if the OCaml version is known to have been shipped with
+      bundled ocamlbuild. We can't detect the three stand-alone versions of
+      ocamlbuild that lack them, 0.9.0, 0.9.1 and 0.9.2. *)
+  then begin
+    pflag ["c"; "compile"] "ccopt" (fun param -> S [A "-ccopt"; A param]);
+    pflag ["c"; "link"] "ccopt" (fun param -> S [A "-ccopt"; A param]);
+    pflag ["c"; "compile"] "cclib" (fun param -> S [A "-cclib"; A param]);
+    pflag ["c"; "link"] "cclib" (fun param -> S [A "-cclib"; A param]);
+  end
+
 (* activate *)
 
 let rules = function
 | Before_rules ->
     link_flag ();
     pkg_conf_flag ();
+    backported_c_flags ();
     x_rules ();
     cc_rules ();
 | _ -> ()
