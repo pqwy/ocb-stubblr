@@ -22,6 +22,8 @@ let chomp s =
   let drop ~rev s = String.drop ~rev ~sat:Char.Ascii.is_white s in
   drop ~rev:false (drop ~rev:true s)
 
+let run_and_read cmd = run_and_read cmd |> chomp
+
 let memo f =
   let t = Hashtbl.create 13 in fun x ->
     try Hashtbl.find t x with Not_found ->
@@ -31,24 +33,21 @@ module Pkg_config = struct
 
   (* XXX Would be nice to move pkg-config results to a build artefact. *)
 
-  let opam_prefix = lazy (
-    try run_and_read "opam config var prefix" |> chomp
-    with Failure _ -> error_msgf "error running opam"
-  )
+  let opam_prefix =
+    let cmd = "opam config var prefix" in
+    lazy ( try run_and_read cmd with Failure _ ->
+            error_msgf "error running opam")
 
-  let env () =
-    let var  = "PKG_CONFIG_PATH" in
-    let vars = [ Lazy.force opam_prefix / "lib" / "pkgconfig" ] @
-      try [ Sys.getenv var ] with Not_found -> [] in
-    (var, String.concat ~sep:":" vars)
+  let var = "PKG_CONFIG_PATH"
+
+  let path () =
+    Lazy.force opam_prefix/"lib"/"pkgconfig" ::
+      (try [Sys.getenv var] with Not_found -> []) |> String.concat ~sep:":"
 
   let run ~flags package =
-    let (var, path) = env () in
-    let cmd =
-      strf "%s=%s pkg-config %s %s 2>/dev/null"
-        var path package (String.concat ~sep:" " flags) in
-    try `Res (run_and_read cmd |> chomp) with Failure _ -> `Nonexistent
-
+    let cmd = strf "%s=%s pkg-config %s %s 2>/dev/null"
+              var (path ()) package (String.concat ~sep:" " flags) in
+    try `Res (run_and_read cmd) with Failure _ -> `Nonexistent
 end
 
 let skip_discovered_dir x = x = "_build" || x.[0] = '.'
@@ -91,11 +90,14 @@ let ocaml_libs ?(mllibs = ["."]) =
     find_ext "mllib" mllibs |> List.iter @@ fun mllib ->
       ocaml_lib (Pathname.remove_extension mllib)
 
-let ccopt_flags ?(tags = []) opts = after_rules @@ fun () ->
+let ccopt ?(tags = []) opts = after_rules @@ fun () ->
   flag (["compile"; "c"] @ tags) (S [A "-ccopt"; A opts])
 
-let cclib_flags ?(tags = []) opts = after_rules @@ fun () ->
+let cclib ?(tags = []) opts = after_rules @@ fun () ->
   flag (["link"; "c"] @ tags) (S [A "-cclib"; A opts])
+
+let ldopt ?(tags = []) opts = after_rules @@ fun () ->
+  flag (["c"; "ocamlmklib"] @ tags) (S [A "-ldopt"; A opts])
 
 let dispatchv hooks = dispatch @@ fun hook -> List.iter (fun f -> f hook) hooks
 
@@ -111,7 +113,7 @@ type os = [
 ]
 
 let os () =
-  match run_and_read "uname -s" |> chomp with
+  match run_and_read "uname -s" with
   | "Linux"        -> `Linux
   | "GNU"          -> `Hurd
   | "Darwin"       -> `Darwin
@@ -137,7 +139,7 @@ let os () =
 type machine = [ `x86_64 | `x86 |  `ARMv6 | `ARMv7 | `UNKNOWN of string ]
 
 let machine () =
-  match run_and_read "uname -m" |> chomp with
+  match run_and_read "uname -m" with
   | "x86_64" | "amd64" | "i686-64" -> `x86_64
   | "i386" | "i686" -> `x86
   | "armv6l" -> `ARMv6
@@ -163,18 +165,21 @@ let link_flag () =
 
 (* *.c depends on *.h *)
 
+(* Source dir is caught as `cwd` at module-init time. *)
+let root = Unix.getcwd ()
+
 let cdeps c deps env _ =
   let c = env c and deps = env deps in
-  (* XXX FIXME FRAGILE: figure out the actual source dir. *)
-  let root = ".." in
-  let cmd = Cmd (S [A "cd"; P root; Sh "&&"; A "cc"; A "-MM"; A "-MG"; P c]) in
-  let to_list str =
-    String.fields ~empty:false ~is_sep:Char.Ascii.is_white str
-      |> List.filter ((<>) "\\") in
-  let lines = match Command.to_string cmd |> run_and_read |> to_list with
+  let to_list str = List.filter ((<>) "\\") @@
+    String.fields ~empty:false ~is_sep:Char.Ascii.is_white str in
+  let cmd = Cmd (
+    S [ A "cd"; P root; Sh "&&";
+        A "cc"; T (tags_of_pathname c); A "-MM"; A "-MG"; P c ]) in
+  let headers = match Command.to_string cmd |> run_and_read |> to_list with
     | _::_::xs -> List.map (fun p -> Pathname.normalize p ^ "\n") xs
     | _ -> error_exit_msgf "%s: depends: unrecognized format" c in
-  Echo (lines, deps)
+  (* XXX Prepend dirname to unresolved headers? *)
+  Echo (headers, deps)
 
 let cc_rules () =
 
@@ -205,13 +210,13 @@ let cc_rules () =
     build (List.map (fun p -> [p]) deps) |> List.iter check_outcome;
     default_action env build in
   rule "ocaml C stubs: c & c.depends -> o"
-    ~prod:x_o
-    ~deps:["%.c"; "%.c.depends"]
-    ~doc:"The OCaml compiler can be passed .c files and will call \
-          the underlying C toolchain to produce corresponding .o files. \
-          ocamlc or ocamlopt will be used depending on whether \
-          the 'native' flag is set on the .c file.\
-          (Extended version, taking #includes into account.)"
+    ~prod:x_o ~deps:["%.c"; "%.c.depends"]
+    (* XXX [~doc] was introduced in OCaml 4.02. *)
+    (* ~doc:"The OCaml compiler can be passed .c files and will call \ *)
+    (*       the underlying C toolchain to produce corresponding .o files. \ *)
+    (*       ocamlc or ocamlopt will be used depending on whether \ *)
+    (*       the 'native' flag is set on the .c file.\ *)
+    (*       (Extended version, taking #includes into account.)" *)
     action
 
 (* pkg-config(package[,relax][,static]) *)

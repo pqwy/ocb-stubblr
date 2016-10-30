@@ -116,15 +116,21 @@ val include_include_dirs : ocb_hook
     locally-built library that has extra [-dllib] flags, the mentioned stubs
     archives will be correctly resolved. *)
 
-val ccopt_flags : ?tags:string list -> string -> ocb_hook
-(** [ccopt_flags tags options] is an {{!ocb_hook}[ocb_hook]} adding
-    [-ccopt options] when compiling C sources tagged with [~tags].
+val ccopt : ?tags:string list -> string -> ocb_hook
+(** [ccopt tags options] adds [-ccopt options] to compilation of C sources
+    tagged with [~tags].
 
     [tags] defaults to [[]]. *)
 
-val cclib_flags : ?tags:string list -> string -> ocb_hook
-(** [cclib_flags tags options] is an {{!ocb_hook}[ocb_hook]} adding
-    [-cclib options] when linking C objects tagged with [~tags].
+val cclib : ?tags:string list -> string -> ocb_hook
+(** [cclib tags options] adds [-cclib options] to linkage of C objects tagged
+    with [~tags].
+
+    [tags] defaults to [[]]. *)
+
+val ldopt : ?tags:string list -> string -> ocb_hook
+(** [ldopt tags options] adds [-ldopt options] when invoking [ocamlmklib] on
+    objects tagged with [~tags].
 
     [tags] defaults to [[]]. *)
 

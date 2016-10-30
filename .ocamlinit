@@ -1,4 +1,4 @@
-#require "ocamlbuild"
+#require "ocamlbuild,astring"
 #directory "_build/src"
 #load "ocb-stubblr.cma"
 
