@@ -20,12 +20,9 @@ val cmd : Conf.t -> Conf.os -> fpath list -> unit result
 
 (** {1 Install helpers} *)
 
-val mirage : ?lib_dst_dir:fpath -> ?xen:bool -> ?fs:bool -> fpath -> Pkg.install list
-(** [mirage ?lib_dst_dir ?cond ?xen ?fs clib] installs Mirage-specific 
-    {{!Ocb_stubblr.multilib}multi-lib} variants of [.clib]. It hands off to
-    {!Topkg.Pkg.clib}.
-
-    [lib_dst_dir] is passed to {!clib}.
+val mirage : ?xen:bool -> ?fs:bool -> fpath -> Pkg.install
+(** [mirage ?xen ?fs clib] installs Mirage-specific
+    {{!Ocb_stubblr.multilib}multi-lib} variants of [.clib].
 
     [xen] controls [mirage-xen] target. Defaults to [false].
 
@@ -41,12 +38,10 @@ val mirage : ?lib_dst_dir:fpath -> ?xen:bool -> ?fs:bool -> fpath -> Pkg.install
 
 let () = Pkg.describe ~build ...]}
 
-
     {2 Mirage}
 
 {[Pkg.describe ... @@ fun c ->
   ...
-  Ok ([ ... ] @
-    mirage ~xen ~fs "path/to/libstubs.clib")]}
+  Ok [ ...; mirage ~xen ~fs "path/to/libstubs.clib"]}
 
 *)

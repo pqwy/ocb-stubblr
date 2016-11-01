@@ -9,8 +9,6 @@ open Astring
 
 let (>>=) a b = match a with Some x -> b x | _ -> None
 
-let strf = Format.asprintf
-
 let error_msgf fmt =
   Format.ksprintf (fun str -> raise (Failure str)) ("Ocb_stubblr: " ^^ fmt)
 
@@ -41,7 +39,7 @@ module Pkg_config = struct
   let var = "PKG_CONFIG_PATH"
 
   let path () =
-    Lazy.force opam_prefix/"lib"/"pkgconfig" ::
+    Lazy.force opam_prefix / "lib" / "pkgconfig" ::
       (try [Sys.getenv var] with Not_found -> []) |> String.concat ~sep:":"
 
   let run ~flags package =
@@ -271,16 +269,16 @@ let x_cdeps src dst target env _ =
   Echo (List.map (fun p -> "X"/target/p^"\n") paths, env dst)
 
 let x_rules () =
-  rule "multi-lib: .deps"
+  rule "multi-lib: derive .c.depends"
     ~dep:"%(path).c.depends" ~prod:"X/%(target)/%(path).c.depends"
     (x_cdeps "%(path).c.depends" "X/%(target)/%(path).c.depends" "%(target)");
-  copy_rule "multi-lib: .c" "%(path).c" "X/%(target)/%(path).c";
-  copy_rule "multi-lib: .h" "%(path).h" "X/%(target)/%(path).h";
-  copy_rule "multi-lib: .clib" "%(path).clib" "X/%(target)/%(path)+%(target).clib";
-  Configuration.parse_string
-    "<X/mirage-xen/**>: pkg-config(mirage-xen, relax, static)";
-  Configuration.parse_string
-    "<X/mirage-freestanding/**>: pkg-config(ocaml-freestanding, relax, static)"
+  copy_rule "multi-lib: cp .c" "%(path).c" "X/%(target)/%(path).c";
+  copy_rule "multi-lib: cp .h" "%(path).h" "X/%(target)/%(path).h";
+  copy_rule "multi-lib: cp .clib" "%(path).clib" "X/%(target)/%(path)+%(target).clib"
+
+let mirage_rules () = let open Configuration in
+  parse_string "<X/mirage-xen/**>: pkg-config(mirage-xen, relax, static)";
+  parse_string "<X/mirage-freestanding/**>: pkg-config(ocaml-freestanding, relax, static)"
 
 (* back-ports of 0.9.3 flags *)
 
@@ -288,8 +286,8 @@ let backported_c_flags () =
   let vs = ["4.01"; "4.02"] in
   if List.exists (fun affix -> String.is_prefix ~affix Sys.ocaml_version) vs
   (* Inject flags if the OCaml version is known to have been shipped with
-      bundled ocamlbuild. We can't detect the three stand-alone versions of
-      ocamlbuild that lack them, 0.9.0, 0.9.1 and 0.9.2. *)
+     bundled ocamlbuild. We can't detect the three stand-alone versions of
+     ocamlbuild that lack them, 0.9.0, 0.9.1 and 0.9.2. *)
   then begin
     pflag ["c"; "compile"] "ccopt" (fun param -> S [A "-ccopt"; A param]);
     pflag ["c"; "link"] "ccopt" (fun param -> S [A "-ccopt"; A param]);
@@ -304,8 +302,9 @@ let rules = function
     link_flag ();
     pkg_conf_flag ();
     backported_c_flags ();
-    x_rules ();
+    x_rules (); (* multi-lib c.depends takes precedence *)
     cc_rules ();
+    mirage_rules ();
 | _ -> ()
 
 let ignore _ = ()

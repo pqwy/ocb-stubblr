@@ -6,12 +6,12 @@ doc: "https://pqwy.github.io/ocb-stubblr/doc"
 license: "ISC"
 dev-repo: "https://github.com/pqwy/ocb-stubblr.git"
 bug-reports: "https://github.com/pqwy/ocb-stubblr/issues"
-tags: []
+tags: ["ocamlbuild"]
 available: [ ocaml-version >= "4.01.0" ]
 depends: [
   "ocamlfind" {build}
   "ocamlbuild" {>="0.9.3" | <"0.9.0"}
-  "topkg" {>= "0.7.8"}
+  "topkg" {>= "0.8.1"}
   "astring" ]
 depopts: []
 build: [ "ocaml" "pkg/pkg.ml" "build" "--pinned" "%{pinned}%" "--tests" "false" ]

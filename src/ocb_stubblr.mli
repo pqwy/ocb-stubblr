@@ -33,6 +33,9 @@
     archive, causing the final executables that use it, to also link with the
     stub library.
 
+    Finally, [ccopt] and [cclib] tags, introduced in OCamlbuild 0.9.3, are added
+    if the plugin is used with an older version.
+
     {2 [pkg-config]}
 
     The plugin adds the parameterized tag [pkg-config].
@@ -74,7 +77,7 @@
     [mirage-freestanding]. These are already marked with the compilation options
     needed to produce C stubs that work with these two MirageOS backends.
 
-    {b Note} If your paths already contain [+], [OCamlbuild] solver is likely to
+    {b Note} If your paths already contain [+], OCamlbuild solver is likely to
     get confused. Assume that the meaning of [+] in paths has been hijacked by
     [ocb-stubblr]. The new semantics of [+] is accessible only through
     transcendental hermenautics.
@@ -262,16 +265,11 @@ val machine : unit -> machine
 
 {[Pkg.describe ... @ fun c ->
   ...
-  Ok ([ Pkg.clib "path/to/libstubs.clib" ] @
-        Ocb_stubblr_topkg.mirage "path/to/libstubs.clib")]}
+  Ok [ Pkg.clib "path/to/libstubs.clib"
+       Ocb_stubblr_topkg.mirage "path/to/libstubs.clib"]}
 
-    or directly require individual targets:
-
-{[Pkg.[clib "src/libstubs.clib";
-     clib "X/mirage-xen/src/libstubs+mirage-xen.clib";
-     clib "X/mirage-freestanding/libstubs+mirage-freestanding.clib"]]}
-
-    Otherwise, arrange for these libraries to be installed.
+    Otherwise, arrange for building and installation of
+    [X/<TARGET>/path/to/libstubs+<TARGET>.a] for all of Mirage [TARGET]s.
 
     When using Mirage, the [META] file still needs to be extended with the
     appropriate link flags, to signal the [mirage] tool to redirect linkage for
