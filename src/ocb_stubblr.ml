@@ -217,33 +217,41 @@ let cc_rules () =
     (*       (Extended version, taking #includes into account.)" *)
     action
 
-(* pkg-config(package[,relax][,static]) *)
-
-let pkgconf_args argstr =
-  match String.cuts ~empty:false ~sep:"," argstr |> List.map chomp with
-  | x::xs -> (x, List.mem "relax" xs, List.mem "static" xs)
-  | _ -> error_msgf "pkg-config(%s): malformed arguments" argstr
+(* pkg-config(package[,relax[,param...]]) *)
 
 let run_pkgconf = memo @@ fun package ->
-  let run f = match Pkg_config.run ~flags:[f] package with
+  let run flags = match Pkg_config.run ~flags package with
     | `Res x -> Some x | _ -> None in
-  run "--cflags" >>= fun cflags ->
-  run "--libs" >>= fun libs ->
-  run "--static" >>= fun static ->
+  run ["--cflags"] >>= fun cflags ->
+  run ["--libs"] >>= fun libs ->
+  run ["--libs"; "--static"] >>= fun static ->
     Some (cflags, libs, static)
 
+let pkgconf_args argstr =
+  match String.cuts ~empty:false ~sep:" " argstr with
+  | x::xs ->
+      let (relax, flags) = List.partition ((=) "relax") xs in
+      (x, List.mem "relax" relax, flags)
+  | _ -> error_msgf "pkg-config(%s): malformed arguments" argstr
+
 let get_pkgconf argstring =
-  let (package, relax, static) = pkgconf_args argstring in
+  let (package, relax, flags) = pkgconf_args argstring in
+  let flag x = List.mem x flags
+  and some = function "" -> None | fl -> Some fl in
   match run_pkgconf package with
   | None when relax -> None
   | None -> error_msgf "pkg-config: package %s not found" package
-  | Some (cf, _, st) when static -> Some (cf, st)
-  | Some (cf, lb, _) -> Some (cf, lb)
+  | Some (cf, lb, lb_st) ->
+      let cf = if flag "cflags" || flags = [] then some cf else None
+      and lb =
+        if flag "static" then some lb_st else
+        if flag "libs" || flags = [] then some lb else None in
+      Some (cf, lb)
 
 let pkg_conf_flag () =
   let tag = "pkg-config" in
   let pkgconf p f args =
-    match get_pkgconf args with Some r when p r <> "" -> f (p r) | _ -> S [] in
+    match get_pkgconf args >>= p with Some x -> f x | _ -> S [] in
   pflag ["c"; "compile"] tag
     (pkgconf fst (fun cflags -> S [A "-ccopt"; A cflags]));
   pflag ["ocaml"; "link"] tag
@@ -277,8 +285,9 @@ let x_rules () =
   copy_rule "multi-lib: cp .clib" "%(path).clib" "X/%(target)/%(path)+%(target).clib"
 
 let mirage_rules () = let open Configuration in
-  parse_string "<X/mirage-xen/**>: pkg-config(mirage-xen, relax, static)";
-  parse_string "<X/mirage-freestanding/**>: pkg-config(ocaml-freestanding, relax, static)"
+  (* Mirage itself takes care of the linkage. *)
+  parse_string "<X/mirage-xen/**>: pkg-config(mirage-xen relax cflags)";
+  parse_string "<X/mirage-freestanding/**>: pkg-config(ocaml-freestanding relax cflags)"
 
 (* back-ports of 0.9.3 flags *)
 

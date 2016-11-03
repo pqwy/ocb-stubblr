@@ -69,12 +69,24 @@
     and record the flags needed to link the final executables against [libSDL2.so]
     to the native and bytecode archives.
 
-    The full syntax of the tag is [pkg-config(package[,relax][,static])].
+    The full syntax of the tag is [pkg-config(package[ relax][ <params>])] where
+    [<params>] is a space-separated combination of any of: [cflags], [libs],
+    [static].
 
-    [relax] will ignore the package if it's not found. Without it, the
-    compilation will abort.
+    [relax] will ignore the package if it is not found. Otherwise, the build
+    will abort.
 
-    [static] will use [--static] instead of [--libs] for the link flags.
+    [cflags] will query [--cflags].
+
+    [libs] will query [--libs].
+
+    [static] will query [--libs --static] (and has precedence over [libs]).
+
+    If none of [cflags], [libs] and [static] are present, [cflags libs] is
+    assumed. Thus [pkg-config(pkg relax)] will query [--cflags] and [--libs],
+    and ignore the error if [pkg] is not installed; [pkg-config(pkg cflags)]
+    will query only the [--cflags]; while [pkg-config(pkg static)] will query
+    only [--libs --static].
 
     {b Note} [.pc] files in the current Opam switch take precedence; see
     {{!Pkg_config}[Pkg_config]}.
@@ -246,7 +258,7 @@ val machine : unit -> machine
     {2 [pkg-config]}
 
     Adding the tag
-{[<src/*.{c,cma,cmxa}>: pkg-config(sdl2, relax)]}
+{[<src/*.{c,cma,cmxa}>: pkg-config(sdl2 relax)]}
     will cause [stubs.c] to be compiled with C flags from [sdl2.pc], and
     [foo.cm{,x}a] to record the link flags.
 
