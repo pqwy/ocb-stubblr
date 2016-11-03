@@ -3,79 +3,98 @@
 
 (** OCamlbuild plugin for C stubs
 
-    OCamlbuild plugin for building C stubs. See the {{!intro}Intro},
-    {{!utilities}Utilities} and {{!examples}Examples}. *)
+    See the {{!intro}Intro}, {{!interface}Interface} or {{!examples}Examples}. *)
 
 
 (** {1:intro Intro}
 
-    [ocb-stubblr] helps dealing with C libraries, especially ones that provide
-    new primitives to OCaml programs (stubs).
+    [ocb-stubblr] helps dealing with C libraries that are built as part of an
+    OCaml project. It is especially useful for libraries of OCaml primitives
+    (stubs).
 
-    Most of the plugin consists of new tags and rules. In order to activate
-    them, {!init} needs to be called from {!Ocamlbuild_plugin.dispatch}:
+    Most of the plugin consists of new tags that can be applied to files, and
+    new rules that are activated when OCamlbuild tries to build certain targets.
+    In order to enable these, {!init} needs to be called from
+    {!Ocamlbuild_plugin.dispatch}:
 
 {[let () = Ocamlbuild_plugin.dispatch Ocb_stubblr.init]}
 
     The plugin helps with three aspects of building C stubs:
 
-    {2 Using [.clib] files}
+    {2 1. Using [.clib] files}
 
-    The plugin adds header detection to [.clib] targets, so that the [.c] files
-    referenced by a [.clib] are made to depend on any project-local files they
-    [#include].
+    [stubblr] modifies [.clib] build rules to automatically search for, and
+    require, project-local headers that the C source files [#include].
 
-    It also adds the parameterized tag [link_stubs]. Tagging ocaml archives
-    ([<foo.cm{,x}a>: link_stubs(path/libbar)]) makes them depend on the C
-    libraries produced by the file [path/libbar.clib]. It also adds the
-    appropriate [-cclib]/[-dllib] flags when linking the native/bytecode
-    archives. This will record the linker flag [-lbar.a] in the produced
-    archive, causing the final executables that use it, to also link with the
-    stub library.
+    Furthermore, it provides the tag [link_stubs()]. This tag acts on OCaml
+    archives, and records the link flags needed for linking with the given C
+    library. The parameter is assumed to be a [.clib] file in the same project.
 
-    Finally, [ccopt] and [cclib] tags, introduced in OCamlbuild 0.9.3, are added
-    if the plugin is used with an older version.
+    For example, adding
+{[<foo.cm{,x}a>: link_stubs(path/libbar)]}
+    records the link flag [-lbar] in [foo.cm{,x}a]. Assuming that the C
+    libraries described by [path/libbar.clib] are installed, this causes any
+    final executables that use the archive [foo.cmxa] (resp. [foo.cma]) to link
+    to [libbar.a] (resp [dllbar.so]). This is useful if [Foo] provides the
+    interface to the C primitives in [libbar].
 
-    {2 [pkg-config]}
+    Another feature is the automatic addition of [use_<lib>] tags for every
+    [<lib>.mllib]. OCaml sources tagged with this tag are built against the
+    archive [<lib>.cm{,x}a], instead of using its constituent [cm{o,x}] through
+    [include] tags. This means that the in-tree executables inherit the link
+    flags (as introduced, for example, above), and are correctly linked against
+    the in-tree C libraries.
 
-    The plugin adds the parameterized tag [pkg-config].
+    Finally, the tags [ccopt] and [cclib], which were introduced in OCamlbuild
+    0.9.3, are added if the plugin is used with an older version. This allows
+    setting these options directly from [_tags] with any OCamlbuild version.
+
+    {2 2. [pkg-config]}
+
+    [stubblr] provides the tag [pkg-config()].
 
     Tagging objects with [pkg-config(package)] will query [pkg-config] for the
-    [package], add its [--cflags] to the compilation of tagged C files, and add
-    its [--libs] to the linkage of tagged C and OCaml files.
+    [package], and:
+
+    {ol
+    {- add the C flags ([pkg-config --cflags]) to the compilation of tagged C
+       sources;}
+    {- add the link flags ([pkg-config --libs]) to the linking step of tagged C
+       libraries; and}
+    {- record those link flags in the tagged OCaml archives.}}
 
     For example
 {[<src/*.{c,cma,cmxa}>: pkg-config(sdl2)]}
-    will add the appropriate flags to compile the C sources with SDL2 includes,
-    link them with [libSDL2], and record the flags needed to link with SDL in
-    the OCaml archives.
+    will add the flags needed to compile against SDL2 when compiling C sources,
+    and record the flags needed to link the final executables against [libSDL2.so]
+    to the native and bytecode archives.
 
     The full syntax of the tag is [pkg-config(package[,relax][,static])].
 
     [relax] will ignore the package if it's not found. Without it, the
     compilation will abort.
-    [static] will use [--static] instead of [--libs] for the link tags.
 
-    {b Note} [pc] files in the current Opam switch take precedence; see
+    [static] will use [--static] instead of [--libs] for the link flags.
+
+    {b Note} [.pc] files in the current Opam switch take precedence; see
     {{!Pkg_config}[Pkg_config]}.
 
-    {2:multilib Multi-lib}
+    {2:multilib 3. Multi-lib}
 
     Sometimes it can be desirable to compile a C library in several ways, e.g.
-    with different compiler options, and install all of the versions.
+    with different compilation options, and install all of the versions.
 
-    The plugin allows compiling every [.clib] file [path/libstub.clib] as if
-    the file [X/<target>/path/libstub+<target>.clib] was also present. It
-    will replicate the needed [.c] and [.h] files in the same directory.
-    For example, a valid new target is [X/foobar/path/libstub+foobar.a]. This
-    new archive is built from the same files as the original one, but it doesn't
-    inherit any of its directly applied tags. Instead, the files
-    [<X/foobar/**/*>] can be marked with a separate set of tags, in order to
-    build and link this archive with different options.
 
-    As a special case, there are two pre-defined targets: [mirage-xen] and
-    [mirage-freestanding]. These are already marked with the compilation options
-    needed to produce C stubs that work with these two MirageOS backends.
+    For any file [path/libstub.clib], [stubblr] introduces the rules to build
+    [X/<TARGET>/path/libstub+<TARGET>.clib], where [<TARGET>] is an arbitrary
+    name. The new library is built from the same sources, but it doesn't inherit
+    any of the tags directly applied to the original [.clib] and its products.
+    Instead, the files [X/<TARGET>/**/*] can be marked with a separate set of
+    tags, causing them to be compiled and/or linked with different options.
+
+    As a special case, there are pre-defined targets for different MirageOS
+    runtimes (currently [mirage-xen] and [mirage-freestanding]). These are
+    automatically tagged with the required compilation options.
 
     {b Note} If your paths already contain [+], OCamlbuild solver is likely to
     get confused. Assume that the meaning of [+] in paths has been hijacked by
@@ -96,44 +115,42 @@ type path = Pathname.t
 val init : ?incdirs:bool -> ?mllibs:path list -> ocb_hook
 (** [init ?incdirs ?paths] initializes the plugin.
 
-    [incdirs] controls wheter {{!include_include_dirs}[include_include_dirs]} is
-    called. Defaults to [true]. Use [false] to disable.
+    [incdirs] causes {{!include_include_dirs}[include_include_dirs]} to be
+    called on initialisation. Defaults to [true].
 
-    [mllibs] passed to {{!ocaml_libs}[ocaml_libs]} to detect [.mllib] files.
-    Defaults to [["."]]. Use [[]] to disable. *)
+    [mllibs] are passed to {{!ocaml_libs}[ocaml_libs]}, to detect any
+    [<lib>.mllib] files and enable their corresponding [use_<lib>] tags.
+    Use [[]] to disable. Defaults to [["."]]. *)
 
 (** {2:utilities Utilities} *)
 
 val ocaml_libs : ?mllibs:path list -> ocb_hook
 (** [ocaml_libs ~mllibs] calls {!Ocamlbuild_plugin.ocaml_lib} on every [.mllib]
-    found in [mllibs].
+    found in [mllibs]. It's a shortcut to enable [use_<lib>] tag for every
+    [<lib>.mllib] in the project.
 
-    [mllibs] is a list of either files or directories. Directories in the list
-    are searched recursively. [mllibs] defaults to [["."]].
-
-    It's a shortcut to enable [use_LIB] tag for every [LIB.mllib].  *)
+    [mllibs] is a list of files or directories. Directories in the list are
+    searched recursively. [mllibs] defaults to [["."]]. *)
 
 val include_include_dirs : ocb_hook
 (** [include_include_dirs] will add [-I dir] when linking OCaml programs for
-    every [dir] marked as [include]. Hence, if the program is compiled against a
-    locally-built library that has extra [-dllib] flags, the mentioned stubs
-    archives will be correctly resolved. *)
+    every [dir] marked as [include]. *)
 
 val ccopt : ?tags:string list -> string -> ocb_hook
-(** [ccopt tags options] adds [-ccopt options] to compilation of C sources
+(** [ccopt tags options] adds [-ccopt options] when compiling the C sources
     tagged with [~tags].
 
     [tags] defaults to [[]]. *)
 
 val cclib : ?tags:string list -> string -> ocb_hook
-(** [cclib tags options] adds [-cclib options] to linkage of C objects tagged
-    with [~tags].
+(** [cclib tags options] adds [-cclib options] when linking the C libraries
+    tagged with [~tags].
 
     [tags] defaults to [[]]. *)
 
 val ldopt : ?tags:string list -> string -> ocb_hook
-(** [ldopt tags options] adds [-ldopt options] when invoking [ocamlmklib] on
-    objects tagged with [~tags].
+(** [ldopt tags options] adds [-ldopt options] when linking the C libraries
+    tagged with [~tags].
 
     [tags] defaults to [[]]. *)
 
@@ -154,10 +171,8 @@ val (&) : ocb_hook -> ocb_hook -> ocb_hook
 
     [pkg-config] is invoked with the environment extended with the equivalent of
     {[PKG_CONFIG_PATH=$(opam config var prefix)/lib/pkgconfig]} This means that
-    any [pc] files in the current Opam switch take precedence over the
-    system-wide ones.
-
-    Queries are cached in the build directory. *)
+    any [.pc] files in the current Opam switch take precedence over the
+    system-wide ones. *)
 module Pkg_config : sig
 
   val run : flags:string list -> string -> [`Nonexistent | `Res of string]
@@ -166,14 +181,14 @@ module Pkg_config : sig
       [`Nonexistent] means that the package was not found. Otherwise,
       [`Res output] is whatever [pkg-config] prints on the standard output.
       
-      {b Note} Currently, error in [pkg-config] invocation also results in
+      {b Note} Currently, all errors in [pkg-config] invocation results in
       [`Nonexistent]. *)
 end
 
 (** {2 OS and machine detection}
 
-    These utilities are included because the host OS and architecture are
-    sometimes important when building C stubs. *)
+    These utilities are included because it is sometimes necessary to change
+    options for building C libraries depending on the host OS and architecture. *)
 
 type os = [
   `Linux | `Hurd | `Darwin | `FreeBSD | `OpenBSD | `NetBSD
@@ -181,10 +196,10 @@ type os = [
 | `Minix | `QNX | `SunOS
 | `Cygwin of string | `Mingw of string | `Uwin of string | `UNKNOWN of string
 ]
-(** A selection of favourite operating systems. *)
+(** A selection of popular operating systems. *)
 
 type machine = [ `x86_64 | `x86 |  `ARMv6 | `ARMv7 | `UNKNOWN of string ]
-(** A selection of machine architectures. *)
+(** A selection of machine architectures supported by OCaml. *)
 
 val os : unit -> os
 (** [os ()] is the normalized result of [uname -s]. *)
@@ -217,23 +232,25 @@ val machine : unit -> machine
 
     {2 Basic integration}
 
-    Initialize from [myocamlbuild.ml]:
+    Initialize the plugin from [myocamlbuild.ml]:
 {[let () = Ocamlbuild_plugin.dispatch Ocb_stubblr.init]}
 
     The file [src/extra/defs.h] will be automatically used when compiling
-    [src/stubs.c], if the latter [#include]s it.
+    [src/stubs.c], if needed.
 
     Adding the tag
 {[<src/*.cm{,x}a>: link_stubs(src/libstubs)]}
-    will make [foo.cmxa]/[foo.cma] link against [libstubs.a]/[dllstubs.so].
+    will record the link flag [-lstubs] in [foo.cm{,x}a], causing executables
+    that use them to link against [libstubs.a]/[dllstubs.so].
 
     {2 [pkg-config]}
 
     Adding the tag
 {[<src/*.{c,cma,cmxa}>: pkg-config(sdl2, relax)]}
-    will add the appropriate compilation and linkage flags to the C sources and
-    archives, and the OCaml archives. If [sdl2] is not installed, it will be
-    ignored.
+    will cause [stubs.c] to be compiled with C flags from [sdl2.pc], and
+    [foo.cm{,x}a] to record the link flags.
+
+    If [SDL2] is not installed, [relax] will cause it to be ignored.
 
     {2 In-tree executables}
 
@@ -241,22 +258,21 @@ val machine : unit -> machine
 
 {[<exe/*>: use_foo]}
 
-    This will create the tag [use_foo] (see {{!ocaml_libs}[ocaml_libs]}), causing
-    [demo] to link with the [cm{,x}a] archive. The archive in turn contains the
-    link flags for the stubs library ([link_stubs]), and [sdl2] ([pkg-config]).
-    It will also add [src] to the include path when linking OCaml executables
-    (see {{!include_include_dirs}[include_include_dirs]}).
+    causing [demo.{native,byte}] to build against [foo.cm{,x}a] and inherit its
+    link flags. The archive, in turn, contains flags for linking to the stub
+    library ([link_stubs()]), and linking to [SDL2] ([pkg-config()]).
 
     {2 Multi-lib}
 
-    Invoking [ocamlbuild X/t/src/libstubs+t.a] will build [libstubs+t.a].
+    Invoking [ocamlbuild X/fnord/src/libstubs+fnord.a] will build
+    [libstubs+fnord.a].
 
-    If [_tags] contained
+    If [_tags] contains
 {[<src/*.c>: ccopt(-flub)
-<X/t/**/*.c>: ccopt(-DT)]}
+<X/fnord/**/*.c>: ccopt(-DA)]}
 
-    then [libstubs+t.a] would {e not} be compiled with [-flub]. Instead, the
-    pre-processor symbol [T] would be defined during compilation.
+    then [libstubs+fnord.a] will {e not} be compiled with [-flub]. Instead, it
+    will be compiled with the pre-processor symbol [A] defined.
 
     {2 Mirage}
 
@@ -265,15 +281,13 @@ val machine : unit -> machine
 
 {[Pkg.describe ... @ fun c ->
   ...
-  Ok [ Pkg.clib "path/to/libstubs.clib"
-       Ocb_stubblr_topkg.mirage "path/to/libstubs.clib"]}
+  Ok [ Pkg.clib "path/to/libstubs.clib";
+       Ocb_stubblr_topkg.mirage "path/to/libstubs.clib"]]}
 
     Otherwise, arrange for building and installation of
-    [X/<TARGET>/path/to/libstubs+<TARGET>.a] for all of Mirage [TARGET]s.
+    [X/<TARGET>/path/to/libstubs+<TARGET>.a] for all MirageOS [TARGET]s.
 
-    When using Mirage, the [META] file still needs to be extended with the
-    appropriate link flags, to signal the [mirage] tool to redirect linkage for
-    various targets.
+    Use of these alternate archives is a matter of MirageOS.
 
     {2 Composition}
 
@@ -281,7 +295,7 @@ val machine : unit -> machine
   | After_rules -> ...
   | ...]}
 
-{[let () = Ocb_stubblr.(dispatchv [ init; myhook; ])]}
+{[let () = Ocb_stubblr.(dispatchv [init; myhook])]}
 
 {[let () = dispatch Ocb_stubblr.(init & myhook)]}
 *)

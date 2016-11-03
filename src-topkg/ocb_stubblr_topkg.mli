@@ -22,19 +22,21 @@ val cmd : Conf.t -> Conf.os -> fpath list -> unit result
 
 val mirage : ?xen:bool -> ?fs:bool -> fpath -> Pkg.install
 (** [mirage ?xen ?fs clib] installs Mirage-specific
-    {{!Ocb_stubblr.multilib}multi-lib} variants of [.clib].
+    {{!Ocb_stubblr.multilib}multi-lib} variants of the given [.clib] file.
 
-    [xen] controls [mirage-xen] target. Defaults to [false].
+    [xen] enables [mirage-xen] target. Defaults to [false].
 
-    [fs] controls [mirage-freestanding] target. Defaults to [false]. *)
+    [fs] enables [mirage-freestanding] target. Defaults to [false]. *)
 
 (** {1 Usage}
 
     In [pkg.ml]:
 
-    {2 Hooking up [ocb-stubblr]}
+    {2 Making [ocb-stubblr] available from [myocamlbuild.ml]}
 
-{[let build = Pkg.build ~cmd:Ocb_stubblr_topkg.cmd ()
+{[#require "ocb-stubblr.topkg"
+
+let build = Pkg.build ~cmd:Ocb_stubblr_topkg.cmd ()
 
 let () = Pkg.describe ~build ...]}
 
@@ -42,6 +44,6 @@ let () = Pkg.describe ~build ...]}
 
 {[Pkg.describe ... @@ fun c ->
   ...
-  Ok [ ...; mirage ~xen ~fs "path/to/libstubs.clib"]}
+  Ok [ ...; mirage ~xen ~fs "path/to/libstubs.clib"]]}
 
 *)
