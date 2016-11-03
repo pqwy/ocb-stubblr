@@ -13,7 +13,7 @@
 <link title="Ocb_stubblr_topkg" rel="Chapter" href="Ocb_stubblr_topkg.html"><link title="Activating ocb-stubblr" rel="Section" href="#1_Activatingocbstubblr">
 <link title="Install helpers" rel="Section" href="#1_Installhelpers">
 <link title="Usage" rel="Section" href="#1_Usage">
-<link title="Hooking up ocb-stubblr" rel="Subsection" href="#2_Hookingupocbstubblr">
+<link title="Making ocb-stubblr available from myocamlbuild.ml" rel="Subsection" href="#2_Makingocbstubblravailablefrommyocamlbuildml">
 <link title="Mirage" rel="Subsection" href="#2_Mirage">
 <title>Ocb_stubblr_topkg</title>
 </head>
@@ -46,19 +46,15 @@ Hook up <a href="Ocb_stubblr.html"><code class="code"><span class="constructor">
 <br>
 <h1 id="1_Installhelpers">Install helpers</h1><br>
 
-<pre><span id="VALmirage"><span class="keyword">val</span> mirage</span> : <code class="type">?lib_dst_dir:Topkg.fpath -><br>       ?xen:bool -> ?fs:bool -> Topkg.fpath -> Topkg.Pkg.install list</code></pre><div class="info ">
-<code class="code">mirage ?lib_dst_dir ?cond ?xen ?fs clib</code> installs Mirage-specific 
-    <a href="Ocb_stubblr.html#multilib">multi-lib</a> variants of <code class="code">.clib</code>. It hands off to
-    <code class="code"><span class="constructor">Topkg</span>.<span class="constructor">Pkg</span>.clib</code>.
+<pre><span id="VALmirage"><span class="keyword">val</span> mirage</span> : <code class="type">?xen:bool -> ?fs:bool -> Topkg.fpath -> Topkg.Pkg.install</code></pre><div class="info ">
+<code class="code">mirage ?xen ?fs clib</code> installs Mirage-specific
+    <a href="Ocb_stubblr.html#multilib">multi-lib</a> variants of the given <code class="code">.clib</code> file.
 <p>
 
-    <code class="code">lib_dst_dir</code> is passed to <code class="code">clib</code>.
+    <code class="code">xen</code> enables <code class="code">mirage-xen</code> target. Defaults to <code class="code"><span class="keyword">false</span></code>.
 <p>
 
-    <code class="code">xen</code> controls <code class="code">mirage-xen</code> target. Defaults to <code class="code"><span class="keyword">false</span></code>.
-<p>
-
-    <code class="code">fs</code> controls <code class="code">mirage-freestanding</code> target. Defaults to <code class="code"><span class="keyword">false</span></code>.<br>
+    <code class="code">fs</code> enables <code class="code">mirage-freestanding</code> target. Defaults to <code class="code"><span class="keyword">false</span></code>.<br>
 </div>
 <br>
 <h1 id="1_Usage">Usage</h1>
@@ -67,10 +63,12 @@ Hook up <a href="Ocb_stubblr.html"><code class="code"><span class="constructor">
     In <code class="code">pkg.ml</code>:
 <p>
 
-    <h2 id="2_Hookingupocbstubblr">Hooking up <code class="code">ocb-stubblr</code></h2>
+    <h2 id="2_Makingocbstubblravailablefrommyocamlbuildml">Making <code class="code">ocb-stubblr</code> available from <code class="code">myocamlbuild.ml</code></h2>
 <p>
 
-<pre class="codepre"><code class="code"><span class="keyword">let</span>&nbsp;build&nbsp;=&nbsp;<span class="constructor">Pkg</span>.build&nbsp;~cmd:<span class="constructor">Ocb_stubblr_topkg</span>.cmd&nbsp;()
+<pre class="codepre"><code class="code"><span class="keywordsign">#</span>require&nbsp;<span class="string">"ocb-stubblr.topkg"</span>
+
+<span class="keyword">let</span>&nbsp;build&nbsp;=&nbsp;<span class="constructor">Pkg</span>.build&nbsp;~cmd:<span class="constructor">Ocb_stubblr_topkg</span>.cmd&nbsp;()
 
 <span class="keyword">let</span>&nbsp;()&nbsp;=&nbsp;<span class="constructor">Pkg</span>.describe&nbsp;~build&nbsp;...</code></pre>
 <p>
@@ -80,7 +78,5 @@ Hook up <a href="Ocb_stubblr.html"><code class="code"><span class="constructor">
 
 <pre class="codepre"><code class="code"><span class="constructor">Pkg</span>.describe&nbsp;...&nbsp;@@&nbsp;<span class="keyword">fun</span>&nbsp;c&nbsp;<span class="keywordsign">-&gt;</span>
 &nbsp;&nbsp;...
-&nbsp;&nbsp;<span class="constructor">Ok</span>&nbsp;([&nbsp;...&nbsp;]&nbsp;@
-&nbsp;&nbsp;<span class="constructor">Ocb_stubblr_topkg</span>.clib_mirage
-&nbsp;&nbsp;&nbsp;&nbsp;~cond&nbsp;~xen&nbsp;~fs&nbsp;<span class="string">"path/to/libstubs.clib"</span>)</code></pre><br>
+&nbsp;&nbsp;<span class="constructor">Ok</span>&nbsp;[&nbsp;...;&nbsp;mirage&nbsp;~xen&nbsp;~fs&nbsp;<span class="string">"path/to/libstubs.clib"</span>]</code></pre><br>
 </body></html>

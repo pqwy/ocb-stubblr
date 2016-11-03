@@ -40,16 +40,16 @@
 </div>
 </td></tr>
 <tr><td align="left"><br>C</td></tr>
-<tr><td><a href="Ocb_stubblr.html#VALcclib_flags">cclib_flags</a> [<a href="Ocb_stubblr.html">Ocb_stubblr</a>]</td>
+<tr><td><a href="Ocb_stubblr.html#VALcclib">cclib</a> [<a href="Ocb_stubblr.html">Ocb_stubblr</a>]</td>
 <td><div class="info">
-<code class="code">cclib_flags tags options</code> is an <a href="Ocb_stubblr.html#TYPEocb_hook"><code class="code">ocb_hook</code></a> adding
-    <code class="code">-cclib options</code> when linking C objects tagged with <code class="code">~tags</code>.
+<code class="code">cclib tags options</code> adds <code class="code">-cclib options</code> when linking the C libraries
+    tagged with <code class="code">~tags</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ocb_stubblr.html#VALccopt_flags">ccopt_flags</a> [<a href="Ocb_stubblr.html">Ocb_stubblr</a>]</td>
+<tr><td><a href="Ocb_stubblr.html#VALccopt">ccopt</a> [<a href="Ocb_stubblr.html">Ocb_stubblr</a>]</td>
 <td><div class="info">
-<code class="code">ccopt_flags tags options</code> is an <a href="Ocb_stubblr.html#TYPEocb_hook"><code class="code">ocb_hook</code></a> adding
-    <code class="code">-ccopt options</code> when compiling C sources tagged with <code class="code">~tags</code>.
+<code class="code">ccopt tags options</code> adds <code class="code">-ccopt options</code> when compiling the C sources
+    tagged with <code class="code">~tags</code>.
 </div>
 </td></tr>
 <tr><td><a href="Ocb_stubblr_topkg.html#VALcmd">cmd</a> [<a href="Ocb_stubblr_topkg.html">Ocb_stubblr_topkg</a>]</td>
@@ -76,6 +76,13 @@
 <code class="code">init ?incdirs ?paths</code> initializes the plugin.
 </div>
 </td></tr>
+<tr><td align="left"><br>L</td></tr>
+<tr><td><a href="Ocb_stubblr.html#VALldopt">ldopt</a> [<a href="Ocb_stubblr.html">Ocb_stubblr</a>]</td>
+<td><div class="info">
+<code class="code">ldopt tags options</code> adds <code class="code">-ldopt options</code> when linking the C libraries
+    tagged with <code class="code">~tags</code>.
+</div>
+</td></tr>
 <tr><td align="left"><br>M</td></tr>
 <tr><td><a href="Ocb_stubblr.html#VALmachine">machine</a> [<a href="Ocb_stubblr.html">Ocb_stubblr</a>]</td>
 <td><div class="info">
@@ -84,8 +91,8 @@
 </td></tr>
 <tr><td><a href="Ocb_stubblr_topkg.html#VALmirage">mirage</a> [<a href="Ocb_stubblr_topkg.html">Ocb_stubblr_topkg</a>]</td>
 <td><div class="info">
-<code class="code">mirage ?lib_dst_dir ?cond ?xen ?fs clib</code> installs Mirage-specific 
-    <a href="Ocb_stubblr.html#multilib">multi-lib</a> variants of <code class="code">.clib</code>.
+<code class="code">mirage ?xen ?fs clib</code> installs Mirage-specific
+    <a href="Ocb_stubblr.html#multilib">multi-lib</a> variants of the given <code class="code">.clib</code> file.
 </div>
 </td></tr>
 <tr><td align="left"><br>O</td></tr>

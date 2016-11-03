@@ -22,11 +22,8 @@ Query <code class="code">pkg-config</code>.
 
     <code class="code">pkg-config</code> is invoked with the environment extended with the equivalent of
     <pre class="codepre"><code class="code"><span class="constructor">PKG_CONFIG_PATH</span>=$(opam&nbsp;config&nbsp;var&nbsp;prefix)/lib/pkgconfig</code></pre> This means that
-    any <code class="code">pc</code> files in the current Opam switch take precedence over the
-    system-wide ones.
-<p>
-
-    Queries are cached in the build directory.<br>
+    any <code class="code">.pc</code> files in the current Opam switch take precedence over the
+    system-wide ones.<br>
 </div>
 <hr width="100%">
 
@@ -38,7 +35,7 @@ Query <code class="code">pkg-config</code>.
       <code class="code"><span class="keywordsign">`</span><span class="constructor">Res</span> output</code> is whatever <code class="code">pkg-config</code> prints on the standard output.
 <p>
 
-      <b>Note</b> Currently, error in <code class="code">pkg-config</code> invocation also results in
+      <b>Note</b> Currently, all errors in <code class="code">pkg-config</code> invocation results in
       <code class="code"><span class="keywordsign">`</span><span class="constructor">Nonexistent</span></code>.<br>
 </div>
 </body></html>
