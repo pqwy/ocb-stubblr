@@ -154,9 +154,14 @@ let link_flag () =
     let name = Pathname.(remove_extension clib |> basename) in
     let name = String.(if is_prefix ~affix:"lib" name then drop ~max:3 name else name) in
     S [A switch; A ("-l"^name)]
+  and inclarg switch clib = match Pathname.dirname clib with
+  | "." -> N
+  | dir -> S [A switch; A ("-L"^dir)]
   and dep flag = Pathname.([remove_extension flag -.- "a"]) in
   pflag ["link"; "ocaml"; "library"; "byte"] tag (libarg "-dllib");
+  pflag ["link"; "ocaml"; "library"; "byte"] tag (inclarg "-dllib");
   pflag ["link"; "ocaml"; "library"; "native"] tag  (libarg "-cclib");
+  pflag ["link"; "ocaml"; "library"; "native"] tag  (inclarg "-cclib");
   pdep ["link"; "ocaml"] tag dep;
   pdep ["compile"; "ocaml"] tag dep
   (* XXX sneak in '-I' for compile;ocaml;program ?? *)
