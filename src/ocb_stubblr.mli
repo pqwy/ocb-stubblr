@@ -182,9 +182,9 @@ val (&) : ocb_hook -> ocb_hook -> ocb_hook
 (** Query [pkg-config].
 
     [pkg-config] is invoked with the environment extended with the equivalent of
-    {[PKG_CONFIG_PATH=$(opam config var prefix)/lib/pkgconfig]} This means that
-    any [.pc] files in the current Opam switch take precedence over the
-    system-wide ones. *)
+    {[PKG_CONFIG_PATH=$(opam config var prefix)/{lib,share}/pkgconfig]}. This
+    means that any [.pc] files in the current Opam switch take precedence over
+    the system-wide ones. *)
 module Pkg_config : sig
 
   val run : flags:string list -> string -> [`Nonexistent | `Res of string]
@@ -192,7 +192,7 @@ module Pkg_config : sig
 
       [`Nonexistent] means that the package was not found. Otherwise,
       [`Res output] is whatever [pkg-config] prints on the standard output.
-      
+
       {b Note} Currently, all errors in [pkg-config] invocation results in
       [`Nonexistent]. *)
 end
