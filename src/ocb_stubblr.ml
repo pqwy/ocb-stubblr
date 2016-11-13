@@ -39,7 +39,7 @@ module Pkg_config = struct
   let var = "PKG_CONFIG_PATH"
 
   let path () =
-    Lazy.force opam_prefix / "lib" / "pkgconfig" ::
+    Lazy.force opam_prefix / "share" / "pkgconfig" ::
       (try [Sys.getenv var] with Not_found -> []) |> String.concat ~sep:":"
 
   let run ~flags package =

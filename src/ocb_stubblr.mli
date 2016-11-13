@@ -182,7 +182,7 @@ val (&) : ocb_hook -> ocb_hook -> ocb_hook
 (** Query [pkg-config].
 
     [pkg-config] is invoked with the environment extended with the equivalent of
-    {[PKG_CONFIG_PATH=$(opam config var prefix)/lib/pkgconfig]} This means that
+    {[PKG_CONFIG_PATH=$(opam config var prefix)/share/pkgconfig]} This means that
     any [.pc] files in the current Opam switch take precedence over the
     system-wide ones. *)
 module Pkg_config : sig
