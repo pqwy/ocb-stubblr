@@ -288,7 +288,7 @@ let x_rules () =
 
 let mirage_rules () = let open Configuration in
   (* Mirage itself takes care of the linkage. *)
-  parse_string "<X/mirage-xen/**>: pkg-config(mirage-xen relax cflags)";
+  parse_string "<X/mirage-xen/**>: pkg-config(mirage-xen-ocaml relax cflags)";
   parse_string "<X/mirage-freestanding/**>: pkg-config(ocaml-freestanding relax cflags)"
 
 (* back-ports of 0.9.3 flags *)
