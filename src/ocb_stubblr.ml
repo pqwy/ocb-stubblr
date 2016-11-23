@@ -82,8 +82,10 @@ type ocb_hook = Ocamlbuild_plugin.hook -> unit
 let after_rules f = function After_rules -> f () | _ -> ()
 
 let include_include_dirs = after_rules @@ fun () ->
-  flag ["ocaml"; "link"; "program"] @@ S
-    List.(map (fun dir -> [A "-I"; A dir]) !Options.include_dirs |> concat)
+  let inc = S List.(!Options.include_dirs
+    |> map (fun dir -> [A "-I"; A dir]) |> concat) in
+  flag ["ocaml"; "link"; "program"] inc;
+  flag ["ocaml"; "link"; "extension:cmxs"] inc
 
 let ocaml_libs ?(mllibs = ["."]) =
   after_rules @@ fun () ->

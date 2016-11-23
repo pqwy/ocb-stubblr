@@ -145,8 +145,8 @@ val ocaml_libs : ?mllibs:path list -> ocb_hook
     searched recursively. [mllibs] defaults to [["."]]. *)
 
 val include_include_dirs : ocb_hook
-(** [include_include_dirs] will add [-I dir] when linking OCaml programs for
-    every [dir] marked as [include]. *)
+(** [include_include_dirs] will add [-I dir] when linking OCaml programs and
+    [cmxs] for every [dir] marked as [include]. *)
 
 val ccopt : ?tags:string list -> string -> ocb_hook
 (** [ccopt tags options] adds [-ccopt options] when compiling the C sources
