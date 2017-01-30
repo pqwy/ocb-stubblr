@@ -3,6 +3,7 @@
 <head>
 <link rel="stylesheet" href="style.css" type="text/css">
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="Start" href="index.html">
 <link rel="next" href="Ocb_stubblr_topkg.html">
 <link rel="Up" href="index.html">
@@ -54,7 +55,7 @@ OCamlbuild plugin for C stubs
     <code class="code"><span class="constructor">Ocamlbuild_plugin</span>.dispatch</code>:
 <p>
 
-<pre class="codepre"><code class="code"><span class="keyword">let</span>&nbsp;()&nbsp;=&nbsp;<span class="constructor">Ocamlbuild_plugin</span>.dispatch&nbsp;<span class="constructor">Ocb_stubblr</span>.init</code></pre>
+<pre class="codepre"><code class="code"><span class="keyword">let</span> () = <span class="constructor">Ocamlbuild_plugin</span>.dispatch <span class="constructor">Ocb_stubblr</span>.init</code></pre>
 <p>
 
     The plugin helps with three aspects of building C stubs:
@@ -73,7 +74,7 @@ OCamlbuild plugin for C stubs
 <p>
 
     For example, adding
-<pre class="codepre"><code class="code">&lt;foo.cm{,x}a&gt;:&nbsp;link_stubs(path/libbar)</code></pre>
+<pre class="codepre"><code class="code">&lt;foo.cm{,x}a&gt;: link_stubs(path/libbar)</code></pre>
     records the link flag <code class="code">-lbar</code> in <code class="code">foo.cm{,x}a</code>. Assuming that the C
     libraries described by <code class="code">path/libbar.clib</code> are installed, this causes any
     final executables that use the archive <code class="code">foo.cmxa</code> (resp. <code class="code">foo.cma</code>) to link
@@ -105,9 +106,9 @@ OCamlbuild plugin for C stubs
 <p>
 
     <OL>
-<li>add the C flags (<code class="code">pkg-config --cflags</code>) to the compilation of tagged C
+<li>add the C flags (<code class="code">pkg-config&nbsp;--cflags</code>) to the compilation of tagged C
        sources;</li>
-<li>add the link flags (<code class="code">pkg-config --libs</code>) to the linking step of tagged C
+<li>add the link flags (<code class="code">pkg-config&nbsp;--libs</code>) to the linking step of tagged C
        libraries; and</li>
 <li>record those link flags in the tagged OCaml archives.</li>
 </OL>
@@ -115,13 +116,13 @@ OCamlbuild plugin for C stubs
 <p>
 
     For example
-<pre class="codepre"><code class="code">&lt;src/*.{c,cma,cmxa}&gt;:&nbsp;pkg-config(sdl2)</code></pre>
+<pre class="codepre"><code class="code">&lt;src/*.{c,cma,cmxa}&gt;: pkg-config(sdl2)</code></pre>
     will add the flags needed to compile against SDL2 when compiling C sources,
     and record the flags needed to link the final executables against <code class="code">libSDL2.so</code>
     to the native and bytecode archives.
 <p>
 
-    The full syntax of the tag is <code class="code">pkg-config(package[ relax][ &lt;params&gt;])</code> where
+    The full syntax of the tag is <code class="code">pkg-config(package[&nbsp;relax][&nbsp;&lt;params&gt;])</code> where
     <code class="code">&lt;params&gt;</code> is a space-separated combination of any of: <code class="code">cflags</code>, <code class="code">libs</code>,
     <code class="code">static</code>.
 <p>
@@ -136,14 +137,14 @@ OCamlbuild plugin for C stubs
     <code class="code">libs</code> will query <code class="code">--libs</code>.
 <p>
 
-    <code class="code">static</code> will query <code class="code">--libs --static</code> (and has precedence over <code class="code">libs</code>).
+    <code class="code">static</code> will query <code class="code">--libs&nbsp;--static</code> (and has precedence over <code class="code">libs</code>).
 <p>
 
-    If none of <code class="code">cflags</code>, <code class="code">libs</code> and <code class="code">static</code> are present, <code class="code">cflags libs</code> is
-    assumed. Thus <code class="code">pkg-config(pkg relax)</code> will query <code class="code">--cflags</code> and <code class="code">--libs</code>,
-    and ignore the error if <code class="code">pkg</code> is not installed; <code class="code">pkg-config(pkg cflags)</code>
-    will query only the <code class="code">--cflags</code>; while <code class="code">pkg-config(pkg static)</code> will query
-    only <code class="code">--libs --static</code>.
+    If none of <code class="code">cflags</code>, <code class="code">libs</code> and <code class="code">static</code> are present, <code class="code">cflags&nbsp;libs</code> is
+    assumed. Thus <code class="code">pkg-config(pkg&nbsp;relax)</code> will query <code class="code">--cflags</code> and <code class="code">--libs</code>,
+    and ignore the error if <code class="code">pkg</code> is not installed; <code class="code">pkg-config(pkg&nbsp;cflags)</code>
+    will query only the <code class="code">--cflags</code>; while <code class="code">pkg-config(pkg&nbsp;static)</code> will query
+    only <code class="code">--libs&nbsp;--static</code>.
 <p>
 
     <b>Note</b> <code class="code">.pc</code> files in the current Opam switch take precedence; see
@@ -184,7 +185,7 @@ OCamlbuild plugin for C stubs
 
 
 <pre><span id="VALinit"><span class="keyword">val</span> init</span> : <code class="type">?incdirs:bool -> ?mllibs:<a href="Ocb_stubblr.html#TYPEpath">path</a> list -> <a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a></code></pre><div class="info ">
-<code class="code">init ?incdirs ?paths</code> initializes the plugin.
+<code class="code">init&nbsp;?incdirs&nbsp;?paths</code> initializes the plugin.
 <p>
 
     <code class="code">incdirs</code> causes <a href="Ocb_stubblr.html#VALinclude_include_dirs"><code class="code">include_include_dirs</code></a> to be
@@ -199,7 +200,7 @@ OCamlbuild plugin for C stubs
 <h2 id="utilities">Utilities</h2><br>
 
 <pre><span id="VALocaml_libs"><span class="keyword">val</span> ocaml_libs</span> : <code class="type">?mllibs:<a href="Ocb_stubblr.html#TYPEpath">path</a> list -> <a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a></code></pre><div class="info ">
-<code class="code">ocaml_libs ~mllibs</code> calls <code class="code"><span class="constructor">Ocamlbuild_plugin</span>.ocaml_lib</code> on every <code class="code">.mllib</code>
+<code class="code">ocaml_libs&nbsp;~mllibs</code> calls <code class="code"><span class="constructor">Ocamlbuild_plugin</span>.ocaml_lib</code> on every <code class="code">.mllib</code>
     found in <code class="code">mllibs</code>. It's a shortcut to enable <code class="code">use_&lt;lib&gt;</code> tag for every
     <code class="code">&lt;lib&gt;.mllib</code> in the project.
 <p>
@@ -209,12 +210,12 @@ OCamlbuild plugin for C stubs
 </div>
 
 <pre><span id="VALinclude_include_dirs"><span class="keyword">val</span> include_include_dirs</span> : <code class="type"><a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a></code></pre><div class="info ">
-<code class="code">include_include_dirs</code> will add <code class="code">-<span class="constructor">I</span> dir</code> when linking OCaml programs for
-    every <code class="code">dir</code> marked as <code class="code"><span class="keyword">include</span></code>.<br>
+<code class="code">include_include_dirs</code> will add <code class="code">-<span class="constructor">I</span>&nbsp;dir</code> when linking OCaml programs and
+    <code class="code">cmxs</code> for every <code class="code">dir</code> marked as <code class="code"><span class="keyword">include</span></code>.<br>
 </div>
 
 <pre><span id="VALccopt"><span class="keyword">val</span> ccopt</span> : <code class="type">?tags:string list -> string -> <a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a></code></pre><div class="info ">
-<code class="code">ccopt tags options</code> adds <code class="code">-ccopt options</code> when compiling the C sources
+<code class="code">ccopt&nbsp;tags&nbsp;options</code> adds <code class="code">-ccopt&nbsp;options</code> when compiling the C sources
     tagged with <code class="code">~tags</code>.
 <p>
 
@@ -222,7 +223,7 @@ OCamlbuild plugin for C stubs
 </div>
 
 <pre><span id="VALcclib"><span class="keyword">val</span> cclib</span> : <code class="type">?tags:string list -> string -> <a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a></code></pre><div class="info ">
-<code class="code">cclib tags options</code> adds <code class="code">-cclib options</code> when linking the C libraries
+<code class="code">cclib&nbsp;tags&nbsp;options</code> adds <code class="code">-cclib&nbsp;options</code> when linking the C libraries
     tagged with <code class="code">~tags</code>.
 <p>
 
@@ -230,7 +231,7 @@ OCamlbuild plugin for C stubs
 </div>
 
 <pre><span id="VALldopt"><span class="keyword">val</span> ldopt</span> : <code class="type">?tags:string list -> string -> <a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a></code></pre><div class="info ">
-<code class="code">ldopt tags options</code> adds <code class="code">-ldopt options</code> when linking the C libraries
+<code class="code">ldopt&nbsp;tags&nbsp;options</code> adds <code class="code">-ldopt&nbsp;options</code> when linking the C libraries
     tagged with <code class="code">~tags</code>.
 <p>
 
@@ -238,20 +239,20 @@ OCamlbuild plugin for C stubs
 </div>
 
 <pre><span id="VALafter_rules"><span class="keyword">val</span> after_rules</span> : <code class="type">(unit -> unit) -> <a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a></code></pre><div class="info ">
-<code class="code">after_rules f</code> is <code class="code"><span class="keyword">function</span> <span class="constructor">After_rules</span> <span class="keywordsign">-&gt;</span> f () <span class="keywordsign">|</span> _ <span class="keywordsign">-&gt;</span> ()</code>.<br>
+<code class="code">after_rules&nbsp;f</code> is <code class="code"><span class="keyword">function</span>&nbsp;<span class="constructor">After_rules</span>&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;f&nbsp;()&nbsp;<span class="keywordsign">|</span>&nbsp;_&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;()</code>.<br>
 </div>
 
 <pre><span id="VALdispatchv"><span class="keyword">val</span> dispatchv</span> : <code class="type"><a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a> list -> unit</code></pre><div class="info ">
-<code class="code">dispatchv hooks</code> is a shortcut for registering several
+<code class="code">dispatchv&nbsp;hooks</code> is a shortcut for registering several
     <a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hooks</a>.
 <p>
 
-    It is equivalent to <code class="code"><span class="constructor">Ocamlbuild_plugin</span>.dispatch hookf</code> where <code class="code">hookf</code> is a
+    It is equivalent to <code class="code"><span class="constructor">Ocamlbuild_plugin</span>.dispatch&nbsp;hookf</code> where <code class="code">hookf</code> is a
     function that applies each hook from <code class="code">hooks</code> in order.<br>
 </div>
 
 <pre><span id="VAL(&)"><span class="keyword">val</span> (&amp;)</span> : <code class="type"><a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a> -> <a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a> -> <a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hook</a></code></pre><div class="info ">
-<code class="code">h1 <span class="keywordsign">&amp;</span> h2</code> is a hook combining <code class="code">h1</code> and <code class="code">h2</code>.<br>
+<code class="code">h1&nbsp;<span class="keywordsign">&amp;</span>&nbsp;h2</code> is a hook combining <code class="code">h1</code> and <code class="code">h2</code>.<br>
 </div>
 
 <pre><span class="keyword">module</span> <a href="Ocb_stubblr.Pkg_config.html">Pkg_config</a>: <code class="code"><span class="keyword">sig</span></code> <a href="Ocb_stubblr.Pkg_config.html">..</a> <code class="code"><span class="keyword">end</span></code></pre><div class="info">
@@ -277,11 +278,11 @@ A selection of machine architectures supported by OCaml.<br>
 
 
 <pre><span id="VALos"><span class="keyword">val</span> os</span> : <code class="type">unit -> <a href="Ocb_stubblr.html#TYPEos">os</a></code></pre><div class="info ">
-<code class="code">os ()</code> is the normalized result of <code class="code">uname -s</code>.<br>
+<code class="code">os&nbsp;()</code> is the normalized result of <code class="code">uname&nbsp;-s</code>.<br>
 </div>
 
 <pre><span id="VALmachine"><span class="keyword">val</span> machine</span> : <code class="type">unit -> <a href="Ocb_stubblr.html#TYPEmachine">machine</a></code></pre><div class="info ">
-<code class="code">machine ()</code> is the normalized result of <code class="code">uname -m</code>.<br>
+<code class="code">machine&nbsp;()</code> is the normalized result of <code class="code">uname&nbsp;-m</code>.<br>
 </div>
 <br>
 <h1 id="examples">Examples</h1>
@@ -310,14 +311,14 @@ A selection of machine architectures supported by OCaml.<br>
 <p>
 
     The content of <code class="code">_tags</code>:
-<pre class="codepre"><code class="code">&lt;src&gt;:&nbsp;<span class="keyword">include</span></code></pre>
+<pre class="codepre"><code class="code">&lt;src&gt;: <span class="keyword">include</span></code></pre>
 <p>
 
     <h2 id="2_Basicintegration">Basic integration</h2>
 <p>
 
     Initialize the plugin from <code class="code">myocamlbuild.ml</code>:
-<pre class="codepre"><code class="code"><span class="keyword">let</span>&nbsp;()&nbsp;=&nbsp;<span class="constructor">Ocamlbuild_plugin</span>.dispatch&nbsp;<span class="constructor">Ocb_stubblr</span>.init</code></pre>
+<pre class="codepre"><code class="code"><span class="keyword">let</span> () = <span class="constructor">Ocamlbuild_plugin</span>.dispatch <span class="constructor">Ocb_stubblr</span>.init</code></pre>
 <p>
 
     The file <code class="code">src/extra/defs.h</code> will be automatically used when compiling
@@ -325,7 +326,7 @@ A selection of machine architectures supported by OCaml.<br>
 <p>
 
     Adding the tag
-<pre class="codepre"><code class="code">&lt;src/*.cm{,x}a&gt;:&nbsp;link_stubs(src/libstubs)</code></pre>
+<pre class="codepre"><code class="code">&lt;src/*.cm{,x}a&gt;: link_stubs(src/libstubs)</code></pre>
     will record the link flag <code class="code">-lstubs</code> in <code class="code">foo.cm{,x}a</code>, causing executables
     that use them to link against <code class="code">libstubs.a</code>/<code class="code">dllstubs.so</code>.
 <p>
@@ -334,7 +335,7 @@ A selection of machine architectures supported by OCaml.<br>
 <p>
 
     Adding the tag
-<pre class="codepre"><code class="code">&lt;src/*.{c,cma,cmxa}&gt;:&nbsp;pkg-config(sdl2&nbsp;relax)</code></pre>
+<pre class="codepre"><code class="code">&lt;src/*.{c,cma,cmxa}&gt;: pkg-config(sdl2 relax)</code></pre>
     will cause <code class="code">stubs.c</code> to be compiled with C flags from <code class="code">sdl2.pc</code>, and
     <code class="code">foo.cm{,x}a</code> to record the link flags.
 <p>
@@ -348,7 +349,7 @@ A selection of machine architectures supported by OCaml.<br>
     To build <code class="code">demo.native</code> and/or <code class="code">demo.byte</code>, <code class="code">_tags</code> needs to contain
 <p>
 
-<pre class="codepre"><code class="code">&lt;exe/*&gt;:&nbsp;use_foo</code></pre>
+<pre class="codepre"><code class="code">&lt;exe/*&gt;: use_foo</code></pre>
 <p>
 
     causing <code class="code">demo.{native,byte}</code> to build against <code class="code">foo.cm{,x}a</code> and inherit its
@@ -359,13 +360,13 @@ A selection of machine architectures supported by OCaml.<br>
     <h2 id="2_Multilib">Multi-lib</h2>
 <p>
 
-    Invoking <code class="code">ocamlbuild <span class="constructor">X</span>/fnord/src/libstubs+fnord.a</code> will build
+    Invoking <code class="code">ocamlbuild&nbsp;<span class="constructor">X</span>/fnord/src/libstubs+fnord.a</code> will build
     <code class="code">libstubs+fnord.a</code>.
 <p>
 
     If <code class="code">_tags</code> contains
-<pre class="codepre"><code class="code">&lt;src/*.c&gt;:&nbsp;ccopt(-flub)
-&lt;<span class="constructor">X</span>/fnord/**/*.c&gt;:&nbsp;ccopt(-<span class="constructor">DA</span>)</code></pre>
+<pre class="codepre"><code class="code">&lt;src/*.c&gt;: ccopt(-flub)
+&lt;<span class="constructor">X</span>/fnord/**/*.c&gt;: ccopt(-<span class="constructor">DA</span>)</code></pre>
 <p>
 
     then <code class="code">libstubs+fnord.a</code> will <em>not</em> be compiled with <code class="code">-flub</code>. Instead, it
@@ -379,10 +380,10 @@ A selection of machine architectures supported by OCaml.<br>
     <a href="Ocb_stubblr_topkg.html#VALmirage"><code class="code"><span class="constructor">Ocb_stubblr_topkg</span>.mirage</code></a>.
 <p>
 
-<pre class="codepre"><code class="code"><span class="constructor">Pkg</span>.describe&nbsp;...&nbsp;@&nbsp;<span class="keyword">fun</span>&nbsp;c&nbsp;<span class="keywordsign">-&gt;</span>
-&nbsp;&nbsp;...
-&nbsp;&nbsp;<span class="constructor">Ok</span>&nbsp;[&nbsp;<span class="constructor">Pkg</span>.clib&nbsp;<span class="string">"path/to/libstubs.clib"</span>;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Ocb_stubblr_topkg</span>.mirage&nbsp;<span class="string">"path/to/libstubs.clib"</span>]</code></pre>
+<pre class="codepre"><code class="code"><span class="constructor">Pkg</span>.describe ... @ <span class="keyword">fun</span> c <span class="keywordsign">-&gt;</span>
+  ...
+  <span class="constructor">Ok</span> [ <span class="constructor">Pkg</span>.clib <span class="string">"path/to/libstubs.clib"</span>;
+       <span class="constructor">Ocb_stubblr_topkg</span>.mirage <span class="string">"path/to/libstubs.clib"</span>]</code></pre>
 <p>
 
     Otherwise, arrange for building and installation of
@@ -395,13 +396,13 @@ A selection of machine architectures supported by OCaml.<br>
     <h2 id="2_Composition">Composition</h2>
 <p>
 
-<pre class="codepre"><code class="code"><span class="keyword">let</span>&nbsp;myhook&nbsp;=&nbsp;<span class="keyword">function</span>
-&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">After_rules</span>&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;...
-&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;...</code></pre>
+<pre class="codepre"><code class="code"><span class="keyword">let</span> myhook = <span class="keyword">function</span>
+  <span class="keywordsign">|</span> <span class="constructor">After_rules</span> <span class="keywordsign">-&gt;</span> ...
+  <span class="keywordsign">|</span> ...</code></pre>
 <p>
 
-<pre class="codepre"><code class="code"><span class="keyword">let</span>&nbsp;()&nbsp;=&nbsp;<span class="constructor">Ocb_stubblr</span>.(dispatchv&nbsp;[init;&nbsp;myhook])</code></pre>
+<pre class="codepre"><code class="code"><span class="keyword">let</span> () = <span class="constructor">Ocb_stubblr</span>.(dispatchv [init; myhook])</code></pre>
 <p>
 
-<pre class="codepre"><code class="code"><span class="keyword">let</span>&nbsp;()&nbsp;=&nbsp;dispatch&nbsp;<span class="constructor">Ocb_stubblr</span>.(init&nbsp;<span class="keywordsign">&amp;</span>&nbsp;myhook)</code></pre><br>
+<pre class="codepre"><code class="code"><span class="keyword">let</span> () = dispatch <span class="constructor">Ocb_stubblr</span>.(init <span class="keywordsign">&amp;</span> myhook)</code></pre><br>
 </body></html>

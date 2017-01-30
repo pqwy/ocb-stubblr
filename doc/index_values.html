@@ -2,6 +2,7 @@
 <head>
 <link rel="stylesheet" href="style.css" type="text/css">
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="Start" href="index.html">
 <link title="Index of types" rel=Appendix href="index_types.html">
 <link title="Index of values" rel=Appendix href="index_values.html">
@@ -17,13 +18,13 @@
 <tr><td align="left"><br></td></tr>
 <tr><td><a href="Ocb_stubblr.html#VAL(&)">(&amp;)</a> [<a href="Ocb_stubblr.html">Ocb_stubblr</a>]</td>
 <td><div class="info">
-<code class="code">h1 <span class="keywordsign">&amp;</span> h2</code> is a hook combining <code class="code">h1</code> and <code class="code">h2</code>.
+<code class="code">h1&nbsp;<span class="keywordsign">&amp;</span>&nbsp;h2</code> is a hook combining <code class="code">h1</code> and <code class="code">h2</code>.
 </div>
 </td></tr>
 <tr><td align="left"><br>A</td></tr>
 <tr><td><a href="Ocb_stubblr.html#VALafter_rules">after_rules</a> [<a href="Ocb_stubblr.html">Ocb_stubblr</a>]</td>
 <td><div class="info">
-<code class="code">after_rules f</code> is <code class="code"><span class="keyword">function</span> <span class="constructor">After_rules</span> <span class="keywordsign">-&gt;</span> f () <span class="keywordsign">|</span> _ <span class="keywordsign">-&gt;</span> ()</code>.
+<code class="code">after_rules&nbsp;f</code> is <code class="code"><span class="keyword">function</span>&nbsp;<span class="constructor">After_rules</span>&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;f&nbsp;()&nbsp;<span class="keywordsign">|</span>&nbsp;_&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;()</code>.
 </div>
 </td></tr>
 <tr><td align="left"><br>B</td></tr>
@@ -35,82 +36,82 @@
 </td></tr>
 <tr><td><a href="Ocb_stubblr_topkg.html#VALbuild_cmd">build_cmd</a> [<a href="Ocb_stubblr_topkg.html">Ocb_stubblr_topkg</a>]</td>
 <td><div class="info">
-<code class="code">build_cmd c os</code> is the default <code class="code"><span class="constructor">Topkg</span>.build_cmd</code> extended with
+<code class="code">build_cmd&nbsp;c&nbsp;os</code> is the default <code class="code"><span class="constructor">Topkg</span>.build_cmd</code> extended with
     <a href="Ocb_stubblr_topkg.html#VALbuild_arg"><code class="code">build_arg</code></a>.
 </div>
 </td></tr>
 <tr><td align="left"><br>C</td></tr>
 <tr><td><a href="Ocb_stubblr.html#VALcclib">cclib</a> [<a href="Ocb_stubblr.html">Ocb_stubblr</a>]</td>
 <td><div class="info">
-<code class="code">cclib tags options</code> adds <code class="code">-cclib options</code> when linking the C libraries
+<code class="code">cclib&nbsp;tags&nbsp;options</code> adds <code class="code">-cclib&nbsp;options</code> when linking the C libraries
     tagged with <code class="code">~tags</code>.
 </div>
 </td></tr>
 <tr><td><a href="Ocb_stubblr.html#VALccopt">ccopt</a> [<a href="Ocb_stubblr.html">Ocb_stubblr</a>]</td>
 <td><div class="info">
-<code class="code">ccopt tags options</code> adds <code class="code">-ccopt options</code> when compiling the C sources
+<code class="code">ccopt&nbsp;tags&nbsp;options</code> adds <code class="code">-ccopt&nbsp;options</code> when compiling the C sources
     tagged with <code class="code">~tags</code>.
 </div>
 </td></tr>
 <tr><td><a href="Ocb_stubblr_topkg.html#VALcmd">cmd</a> [<a href="Ocb_stubblr_topkg.html">Ocb_stubblr_topkg</a>]</td>
 <td><div class="info">
-<code class="code">cmd c os files</code> is a full invocation of <a href="Ocb_stubblr_topkg.html#VALbuild_cmd"><code class="code">build_cmd</code></a>.
+<code class="code">cmd&nbsp;c&nbsp;os&nbsp;files</code> is a full invocation of <a href="Ocb_stubblr_topkg.html#VALbuild_cmd"><code class="code">build_cmd</code></a>.
 </div>
 </td></tr>
 <tr><td align="left"><br>D</td></tr>
 <tr><td><a href="Ocb_stubblr.html#VALdispatchv">dispatchv</a> [<a href="Ocb_stubblr.html">Ocb_stubblr</a>]</td>
 <td><div class="info">
-<code class="code">dispatchv hooks</code> is a shortcut for registering several
+<code class="code">dispatchv&nbsp;hooks</code> is a shortcut for registering several
     <a href="Ocb_stubblr.html#TYPEocb_hook">ocb_hooks</a>.
 </div>
 </td></tr>
 <tr><td align="left"><br>I</td></tr>
 <tr><td><a href="Ocb_stubblr.html#VALinclude_include_dirs">include_include_dirs</a> [<a href="Ocb_stubblr.html">Ocb_stubblr</a>]</td>
 <td><div class="info">
-<code class="code">include_include_dirs</code> will add <code class="code">-<span class="constructor">I</span> dir</code> when linking OCaml programs for
-    every <code class="code">dir</code> marked as <code class="code"><span class="keyword">include</span></code>.
+<code class="code">include_include_dirs</code> will add <code class="code">-<span class="constructor">I</span>&nbsp;dir</code> when linking OCaml programs and
+    <code class="code">cmxs</code> for every <code class="code">dir</code> marked as <code class="code"><span class="keyword">include</span></code>.
 </div>
 </td></tr>
 <tr><td><a href="Ocb_stubblr.html#VALinit">init</a> [<a href="Ocb_stubblr.html">Ocb_stubblr</a>]</td>
 <td><div class="info">
-<code class="code">init ?incdirs ?paths</code> initializes the plugin.
+<code class="code">init&nbsp;?incdirs&nbsp;?paths</code> initializes the plugin.
 </div>
 </td></tr>
 <tr><td align="left"><br>L</td></tr>
 <tr><td><a href="Ocb_stubblr.html#VALldopt">ldopt</a> [<a href="Ocb_stubblr.html">Ocb_stubblr</a>]</td>
 <td><div class="info">
-<code class="code">ldopt tags options</code> adds <code class="code">-ldopt options</code> when linking the C libraries
+<code class="code">ldopt&nbsp;tags&nbsp;options</code> adds <code class="code">-ldopt&nbsp;options</code> when linking the C libraries
     tagged with <code class="code">~tags</code>.
 </div>
 </td></tr>
 <tr><td align="left"><br>M</td></tr>
 <tr><td><a href="Ocb_stubblr.html#VALmachine">machine</a> [<a href="Ocb_stubblr.html">Ocb_stubblr</a>]</td>
 <td><div class="info">
-<code class="code">machine ()</code> is the normalized result of <code class="code">uname -m</code>.
+<code class="code">machine&nbsp;()</code> is the normalized result of <code class="code">uname&nbsp;-m</code>.
 </div>
 </td></tr>
 <tr><td><a href="Ocb_stubblr_topkg.html#VALmirage">mirage</a> [<a href="Ocb_stubblr_topkg.html">Ocb_stubblr_topkg</a>]</td>
 <td><div class="info">
-<code class="code">mirage ?xen ?fs clib</code> installs Mirage-specific
+<code class="code">mirage&nbsp;?xen&nbsp;?fs&nbsp;clib</code> installs Mirage-specific
     <a href="Ocb_stubblr.html#multilib">multi-lib</a> variants of the given <code class="code">.clib</code> file.
 </div>
 </td></tr>
 <tr><td align="left"><br>O</td></tr>
 <tr><td><a href="Ocb_stubblr.html#VALocaml_libs">ocaml_libs</a> [<a href="Ocb_stubblr.html">Ocb_stubblr</a>]</td>
 <td><div class="info">
-<code class="code">ocaml_libs ~mllibs</code> calls <code class="code"><span class="constructor">Ocamlbuild_plugin</span>.ocaml_lib</code> on every <code class="code">.mllib</code>
+<code class="code">ocaml_libs&nbsp;~mllibs</code> calls <code class="code"><span class="constructor">Ocamlbuild_plugin</span>.ocaml_lib</code> on every <code class="code">.mllib</code>
     found in <code class="code">mllibs</code>.
 </div>
 </td></tr>
 <tr><td><a href="Ocb_stubblr.html#VALos">os</a> [<a href="Ocb_stubblr.html">Ocb_stubblr</a>]</td>
 <td><div class="info">
-<code class="code">os ()</code> is the normalized result of <code class="code">uname -s</code>.
+<code class="code">os&nbsp;()</code> is the normalized result of <code class="code">uname&nbsp;-s</code>.
 </div>
 </td></tr>
 <tr><td align="left"><br>R</td></tr>
 <tr><td><a href="Ocb_stubblr.Pkg_config.html#VALrun">run</a> [<a href="Ocb_stubblr.Pkg_config.html">Ocb_stubblr.Pkg_config</a>]</td>
 <td><div class="info">
-<code class="code">run ~flags package</code> queries <code class="code">pkg-config</code> about <code class="code">package</code>, using <code class="code">flags</code>.
+<code class="code">run&nbsp;~flags&nbsp;package</code> queries <code class="code">pkg-config</code> about <code class="code">package</code>, using <code class="code">flags</code>.
 </div>
 </td></tr>
 </table>
