@@ -1,3 +1,9 @@
+## v0.1.1 2017-01-30
+
+* Include both `lib` and `share` in pkg-config path.
+* Use `mirage-xen-ocaml` for Xen pkg-config.
+* Add include dirs to `cmxs` linking.
+
 ## v0.1.0 2016-11-03
 
 * Fix header discovery and its interaction with multi-lib.
