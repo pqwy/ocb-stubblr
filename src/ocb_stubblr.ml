@@ -41,7 +41,8 @@ module Pkg_config = struct
   let path () =
     let opam = Lazy.force opam_prefix
     and rest = try [Sys.getenv var] with Not_found -> [] in
-    opam/"lib"/"pkgconfig" :: opam/"share"/"pkgconfig" :: rest
+    (* the order matters (at least for old (0.24, ubuntu 14.04) pkgconfig *)
+    opam/"share"/"pkgconfig" :: opam/"lib"/"pkgconfig" :: rest
       |> String.concat ~sep:":"
 
   let run ~flags package =
