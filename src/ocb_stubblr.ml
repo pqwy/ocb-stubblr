@@ -160,7 +160,7 @@ let link_flag () =
     S [A switch; A ("-l"^name)]
   and dep flag = Pathname.([remove_extension flag -.- "a"]) in
   pflag ["link"; "ocaml"; "library"; "byte"] tag (libarg "-dllib");
-  pflag ["link"; "ocaml"; "library"; "native"] tag  (libarg "-cclib");
+  pflag ["link"; "ocaml"; "library"] tag  (libarg "-cclib");
   pdep ["link"; "ocaml"] tag dep;
   pdep ["compile"; "ocaml"] tag dep
   (* XXX sneak in '-I' for compile;ocaml;program ?? *)
