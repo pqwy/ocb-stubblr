@@ -31,10 +31,14 @@ module Pkg_config = struct
 
   (* XXX Would be nice to move pkg-config results to a build artefact. *)
 
-  let opam_prefix =
+  let opam_prefix_cmd =
     let cmd = "opam config var prefix" in
     lazy ( try run_and_read cmd with Failure _ ->
             error_msgf "error running opam")
+
+  let opam_prefix =
+    lazy (try Sys.getenv "OPAM_SWITCH_PREFIX"
+          with Not_found -> Lazy.force opam_prefix_cmd)
 
   let var = "PKG_CONFIG_PATH"
 
