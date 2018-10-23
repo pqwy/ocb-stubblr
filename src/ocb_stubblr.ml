@@ -8,6 +8,7 @@ open Astring
 
 
 let (>>=) a b = match a with Some x -> b x | _ -> None
+let (>>|) a b = match a with Some x -> Some (b x) | _ -> None
 
 let error_msgf fmt =
   Format.ksprintf (fun str -> raise (Failure str)) ("Ocb_stubblr: " ^^ fmt)
@@ -227,9 +228,11 @@ let run_pkgconf = memo @@ fun package ->
   let run flags = match Pkg_config.run ~flags package with
     | `Res x -> Some x | _ -> None in
   run ["--cflags"] >>= fun cflags ->
-  run ["--libs"] >>= fun libs ->
+  run ["--libs-only-l"] >>= fun libs_l ->
+  run ["--libs-only-L"] >>= fun libs_L ->
+  run ["--libs-only-other"] >>= fun libs_other ->
   run ["--libs"; "--static"] >>= fun static ->
-    Some (cflags, libs, static)
+    Some (cflags, (libs_l, libs_L, libs_other), static)
 
 let pkgconf_args argstr =
   match String.cuts ~empty:false ~sep:" " argstr with
@@ -245,23 +248,39 @@ let get_pkgconf argstring =
   match run_pkgconf package with
   | None when relax -> None
   | None -> error_msgf "pkg-config: package %s not found" package
-  | Some (cf, lb, lb_st) ->
+  | Some (cf, (lb_l, lb_L, lb_o), lb_st) ->
       let cf = if flag "cflags" || flags = [] then some cf else None
       and lb =
-        if flag "static" then some lb_st else
-        if flag "libs" || flags = [] then some lb else None in
+        if flag "static" then
+          Some (some lb_st, None, None) else
+        if flag "libs" || flags = [] then
+          Some (some lb_l, some lb_L, some lb_o)
+        else None in
       Some (cf, lb)
 
 let pkg_conf_flag () =
   let tag = "pkg-config" in
+  let to_list = function Some x -> [x] | None -> [] in
   let pkgconf p f args =
     match get_pkgconf args >>= p with Some x -> f x | _ -> S [] in
   pflag ["c"; "compile"] tag
     (pkgconf fst (fun cflags -> S [A "-ccopt"; A cflags]));
   pflag ["ocaml"; "link"] tag
-    (pkgconf snd (fun libs -> S [A "-cclib"; A libs]));
+    (pkgconf snd (fun (lb_l, lb_L, lb_o) -> S (
+         List.flatten [
+           to_list (lb_l >>| fun libs -> S [A "-cclib"; A libs]);
+           to_list (lb_L >>| fun libs -> S [A "-cclib"; A libs]);
+           to_list (lb_o >>| fun libs -> S [A "-cclib"; A libs]);
+         ] 
+       )));
   pflag ["c"; "ocamlmklib"] tag
-    (pkgconf snd (fun libs -> A libs))
+    (pkgconf snd (fun (lb_l, lb_L, lb_o) -> S (
+         List.flatten [
+           to_list (lb_l >>| fun libs -> A libs);
+           to_list (lb_L >>| fun libs -> S [A "-ldopt"; A libs]);
+           to_list (lb_o >>| fun libs -> S [A "-ldopt"; A libs]);
+         ] 
+       )))
 
 (* let () = *)
 (*   rule "get pkg-config" ~prod:"%(package).pkg-config" *)
